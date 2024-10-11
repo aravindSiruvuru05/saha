@@ -1,0 +1,10 @@
+# .pgmrc
+# Database connection configuration
+PGDATABASE=saha_local
+PGUSER=postgres
+PGPASSWORD=12345
+PGHOST=localhost
+PGPORT=5432
+
+# Directory for migrations
+MIGRATION_DIR=./migrations

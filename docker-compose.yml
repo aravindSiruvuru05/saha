@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+    build:
+      context: ./api
+    ports:
+      - "8080:8080" 
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - network-backend
+      
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - saha_local:/var/lib/postgresql/data 
+    ports:
+      - "5432:5432"    
+    networks:
+      - network-backend
+
+volumes:
+  saha_local:  
+
+networks:
+  network-backend:
