@@ -29,7 +29,7 @@ export const signup = catchAsync(
     if (password !== confirmPassword) {
       return next(
         new AppError(
-          'Given password and confirm password did not match.',
+          'Given password and confirm password did not match',
           STATUS_CODES.BAD_REQUEST,
         ),
       )
