@@ -1,30 +1,18 @@
 version: '3.8'
 
 services:
-  web:
-    depends_on:
-      - api
-      - db
-    build:
-      context: ./web
-    ports:
-      - "3000:3000" 
-    volumes:
-      - ./web:/usr/src/app
-    networks:
-      - network-backend 
-
   api:
     depends_on:
       - db
     environment:
       - DB_HOST=db
+      - NODE_ENV=production
+    restart: on-failure
     build:
       context: ./api
+      dockerfile: Dockerfile.prod
     ports:
       - "8080:8080" 
-    volumes:
-      - ./api:/usr/src/app
     networks:
       - network-backend
       
@@ -36,14 +24,14 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     volumes:
-      - saha_local:/var/lib/postgresql/data 
+      - saha_prod:/var/lib/postgresql/data 
     ports:
       - "5432:5432"    
     networks:
       - network-backend
 
 volumes:
-  saha_local:  
+  saha_prod:  
 
 networks:
   network-backend:

@@ -1,16 +1,13 @@
-# Use the official node image as a build environment
-FROM node:18-alpine as build
+FROM node:20.18.0-alpine as build
 
-# Set working directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Install dependencies
 COPY package*.json ./
-RUN npm install
 
-# Copy all files
+RUN yarn install
+
 COPY . .
 
-# Build the app
-RUN npm run build
+EXPOSE 3001
 
+CMD ["yarn", "dev"]

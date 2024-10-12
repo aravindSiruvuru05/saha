@@ -1,0 +1,35 @@
+# Stage 1: Build the application
+FROM node:20.18.0-alpine AS build
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+# Install dependencies, including dev dependencies, for the build step
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+# Run the build step if you have it
+RUN yarn build
+
+# Stage 2: Production image
+FROM node:20.18.0-alpine AS production
+
+WORKDIR /usr/src/app
+
+# Copy only the package.json and yarn.lock to avoid unnecessary files
+COPY package.json yarn.lock ./
+
+# Set the environment variable for production
+ENV NODE_ENV=production
+
+# Install only production dependencies
+RUN yarn install --frozen-lockfile --production
+
+# Copy built application from the build stage
+COPY --from=build /usr/src/app/dist ./dist
+
+EXPOSE 8080
+
+CMD ["yarn", "start"]
