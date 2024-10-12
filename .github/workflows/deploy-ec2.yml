@@ -19,7 +19,7 @@ jobs:
 
       - name: Copy files to EC2
         run: |
-          scp -r -o StrictHostKeyChecking=no . ec2-user@3.12.104.221:/app
+          scp -r -o StrictHostKeyChecking=no ./ ec2-user@3.12.104.221:/app
 
       - name: SSH to EC2 and deploy
         run: |
