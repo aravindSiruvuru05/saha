@@ -24,6 +24,6 @@ jobs:
       - name: SSH to EC2 and deploy
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@3.12.104.221 << 'EOF'
-            cd ./app
+            cd ./app/saha
             ./dev-env up prod
           EOF
