@@ -1,18 +1,18 @@
 version: '3.8'
 
 services:
-  web:
-    depends_on:
-      - api
-      - db
-    build:
-      context: ./web
-    ports:
-      - "3000:3000" 
-    volumes:
-      - ./web:/usr/src/app
-    networks:
-      - network-backend 
+  # web:
+  #   depends_on:
+  #     - api
+  #     - db
+  #   build:
+  #     context: ./web
+  #   ports:
+  #     - "3000:3000" 
+  #   volumes:
+  #     - ./web:/usr/src/app
+  #   networks:
+  #     - network-backend 
 
   api:
     depends_on:
