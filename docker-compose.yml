@@ -10,7 +10,7 @@ services:
   #   ports:
   #     - "3000:3000" 
   #   volumes:
-  #     - ./web:/usr/src/app
+  #     - ./web:/app
   #   networks:
   #     - network-backend 
 
@@ -21,10 +21,12 @@ services:
       - DB_HOST=db
     build:
       context: ./api
+    # env_file:
+    #   - ./api/.env
     ports:
       - "8080:8080" 
     volumes:
-      - ./api:/usr/src/app
+      - ./api:/app
     networks:
       - network_backend
       
