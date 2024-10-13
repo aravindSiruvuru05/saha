@@ -66,7 +66,10 @@ export const prepareAuthorizationHeader = (): Record<string, string> => {
 export const apiSlice = createApi({
   reducerPath: 'api', // The key for the API reducer
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8080/',
+    baseUrl:
+      process.env.NEXT_PUBLIC_NODE_ENV === 'production'
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'http://localhost:8080/',
     prepareHeaders: async headers => {
       const authorizationHeaders = await prepareAuthorizationHeader();
       Object.entries(authorizationHeaders).forEach(([key, value]) => {
