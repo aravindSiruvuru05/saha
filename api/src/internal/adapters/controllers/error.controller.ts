@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import AppError from '../../../shared/utils/appError'
+import logger from '../../../shared/utils/logger'
 
 // Handle database cast error
 const handleCastErrorDB = (err: any): AppError => {
@@ -41,7 +42,6 @@ const sendErrorDev = (err: AppError, res: Response): void => {
 
 // Send error response in production
 const sendErrorProd = (err: AppError, res: Response): void => {
-  console.log(err.message)
   // Operational, trusted error: send message to client
   if (err.isOperational) {
     res.status(err.statusCode).json({
@@ -68,6 +68,7 @@ export default (
 ): void => {
   err.statusCode = err.statusCode || 500
   err.status = err.status || 'error'
+  logger.error(err)
 
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res)
@@ -75,7 +76,6 @@ export default (
     // AppError message is not getting destructured as it is in the Parent Error and destructring is happening on the top level of the AppError
     let error = { ...err, message: err.message }
 
-    error.isOperational = true // making all below as operationsal so that they are returned in sendProdError instead of default value
     if (error.name === 'CastError') error = handleCastErrorDB(error)
     else if (error.code === '23505') error = handleDuplicateFieldsDB(error)
     else if (error.name === 'ValidationError')
@@ -84,7 +84,6 @@ export default (
       error = handleJsonWebTokenError()
     else if (error.name === 'TokenExpiredError')
       error = handleTokenExpiredError()
-    else error.isOperational = false
     sendErrorProd(error, res)
   }
 }
