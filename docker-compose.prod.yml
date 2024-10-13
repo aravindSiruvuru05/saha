@@ -14,7 +14,7 @@ services:
     ports:
       - "8080:8080" 
     networks:
-      - network-backend
+      - network_backend
       
   db:
     image: postgres:14.1-alpine
@@ -28,10 +28,10 @@ services:
     ports:
       - "5432:5432"    
     networks:
-      - network-backend
+      - network_backend
 
 volumes:
   saha_prod:  
 
 networks:
-  network-backend:
+  network_backend:
