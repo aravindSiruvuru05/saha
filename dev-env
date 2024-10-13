@@ -4,6 +4,12 @@ export COMPOSE_FILE=docker-compose.yml
 export ENV_FILE=local_env
 
 if [[ "$1" = "up" ]]; then
+    if [ "$(docker-compose ps -q)" ]; then
+            echo "Stopping and removing existing containers..."
+            docker-compose down
+    else
+            echo "No containers are running."
+    fi
     if [ "$2" = "debug" ]; then
         echo "Starting Application in DEBUG MODE...";
         docker-compose -f $COMPOSE_FILE --env-file ${ENV_FILE} up api.debug db
