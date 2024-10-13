@@ -27,7 +27,7 @@ const corsOptions = {
 app.use(cors(corsOptions)) // Use the CORS middleware
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(`REQUEST BODY:::::> ${JSON.stringify(req.body)}`)
+  console.log(`REQUEST BODY::::> ${JSON.stringify(req.body)}`)
   console.log(`REQUEST QUERY PARAMS:::::> ${JSON.stringify(req.query)}`)
   next()
 })
