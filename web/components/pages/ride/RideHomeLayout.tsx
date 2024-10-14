@@ -26,7 +26,7 @@ export const RideHomeLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="bg-primary text-primary-foreground pt-16  pb-4 px-4 lg:py-4 fixed top-0 left-0 right-0 z-10 flex items-center justify-between shadow-lg">
+      <header className="bg-primary text-primary-foreground pb-4 px-4 py-4 fixed top-0 left-0 right-0 z-10 flex items-center justify-between shadow-lg">
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetTrigger asChild>
             <Button
@@ -76,7 +76,7 @@ export const RideHomeLayout = () => {
       </header>
 
       <main
-        className="flex-grow min-h-screen flex items-start justify-center p-4 mt-28 lg:mt-16 mb-20 overflow-auto bg-right md:bg-center bg-cover"
+        className="flex-grow min-h-screen flex items-start justify-center p-4 mt-16 lg:mt-16 mb-20 overflow-auto bg-right md:bg-center bg-cover"
         style={{
           height: 'calc(100vh - 4rem - 4rem)',
           backgroundImage: `url(${images.src})`,
@@ -87,7 +87,7 @@ export const RideHomeLayout = () => {
         {activeTab === 'my-rides' && <MyRides />}
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg pb-8 lg:pb-0">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg lg:pb-0">
         <nav className="flex justify-around items-center h-16">
           <button
             onClick={() => setActiveTab('ride-search')}
