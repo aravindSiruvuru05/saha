@@ -61,18 +61,14 @@ export const prepareAuthorizationHeader = (): Record<string, string> => {
   }
   return {};
 };
-console.log(
-  process.env.NEXT_PUBLIC_NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_API_URL
-    : 'http://localhost:8080/',
-);
+
 // Define your API slice
 export const apiSlice = createApi({
   reducerPath: 'api', // The key for the API reducer
   baseQuery: fetchBaseQuery({
     baseUrl:
       process.env.NEXT_PUBLIC_NODE_ENV === 'production'
-        ? 'http://18.220.173.163:8080/'
+        ? process.env.NEXT_PUBLIC_API_URL
         : 'http://localhost:8080/',
     prepareHeaders: async headers => {
       const authorizationHeaders = await prepareAuthorizationHeader();
