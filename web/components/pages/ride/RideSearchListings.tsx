@@ -152,7 +152,7 @@ export const RideSearchListings = () => {
   return (
     <div className="max-h-screen flex flex-col bg-gray-100 h-screen">
       {/* Top bar */}
-      <div className="sticky top-0 z-10 bg-white shadow-md pt-16  pb-4 md:py-4 flex items-center space-x-4 px-4">
+      <div className="sticky top-0 z-10 bg-white shadow-md  pb-4 py-4 flex items-center space-x-4 px-4">
         <Button
           variant="ghost"
           size="icon"
