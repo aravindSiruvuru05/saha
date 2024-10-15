@@ -38,12 +38,12 @@ export const DatePicker = ({ value, onChange }: IDatePickerProps) => {
           <Button
             variant={'outline'}
             className={cn(
-              'w-[100%] justify-start text-left font-normal shadow-sm border bg-white hover:bg-white max-w-[400px]',
+              'w-[100%] justify-start text-left font-normal shadow-sm text-md border bg-white hover:bg-white max-w-[400px]',
               !date && 'text-muted-foreground',
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, 'PPP') : <span>Pick a date</span>}
+            {date ? format(date, 'PPP') : <span>Pick your travel date...</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

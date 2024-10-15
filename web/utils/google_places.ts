@@ -30,6 +30,28 @@ export const getPlacePredictions = (
   });
 };
 
+// New function to get current location details using reverse geocoding
+export const getCurrentLocationDetails = async (
+  latitude: number,
+  longitude: number,
+): Promise<IPlaceDetails> => {
+  return new Promise((resolve, reject) => {
+    loadGooglePlacesAPI().then(() => {
+      const geocoder = new google.maps.Geocoder();
+      const latLng = new google.maps.LatLng(latitude, longitude);
+
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+          const placeDetails = extractBiggerAreaFromGeocodeResult(results[0]);
+          resolve(placeDetails);
+        } else {
+          reject(status);
+        }
+      });
+    });
+  });
+};
+
 export interface IPlaceDetails {
   placeID: string;
   neighborhood: string;
@@ -39,27 +61,78 @@ export interface IPlaceDetails {
   country: string;
   description: string;
 }
-export const extractBiggerArea = (
-  place: google.maps.places.AutocompletePrediction,
+
+// Extract details from a geocode result
+export const extractBiggerAreaFromGeocodeResult = (
+  result: google.maps.places.PlaceResult,
 ): IPlaceDetails => {
-  const { terms, place_id, description } = place;
-  const len = terms.length;
+  const addressComponents = result.address_components;
+  if (!addressComponents) return {} as IPlaceDetails;
+  const placeID = result.place_id || '';
+  const description = result.formatted_address || '';
 
-  // Depending on the length of the terms, map them to neighborhood, city, state, country
-  const country = len > 0 ? terms[len - 1].value : '';
-  const state = len > 1 ? terms[len - 2].value : '';
-  const city = len > 2 ? terms[len - 3].value : '';
-  const locality = len > 3 ? terms[len - 4].value : '';
-  const neighborhood = len > 4 ? terms[len - 5].value : '';
+  let neighborhood = '';
+  let locality = '';
+  let city = '';
+  let state = '';
+  let country = '';
 
-  // Return the larger area like city and beyond
+  for (const component of addressComponents) {
+    const types = component.types;
+    if (types.includes('neighborhood')) {
+      neighborhood = component.long_name;
+    } else if (types.includes('locality')) {
+      locality = component.long_name;
+    } else if (types.includes('administrative_area_level_2')) {
+      city = component.long_name;
+    } else if (types.includes('administrative_area_level_1')) {
+      state = component.long_name;
+    } else if (types.includes('country')) {
+      country = component.long_name;
+    }
+  }
+
   return {
-    placeID: place_id,
-    neighborhood: neighborhood, // Example: "Raja Rajeshwara Nagar"
+    placeID,
+    neighborhood,
     locality,
-    city, // Example: "Kondapur"
-    state, // Example: "Telangana"
-    country, // Example: "India"
+    city,
+    state,
+    country,
     description,
   };
+};
+
+export const getPlaceDetailsByPlaceID = (
+  placeID: string,
+): Promise<IPlaceDetails> => {
+  return new Promise((resolve, reject) => {
+    loadGooglePlacesAPI().then(() => {
+      const service = new google.maps.places.PlacesService(
+        document.createElement('div'),
+      );
+
+      service.getDetails({ placeId: placeID }, (result, status) => {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          result &&
+          result.address_components != undefined
+        ) {
+          // Check if result is not null before calling extractBiggerAreaFromGeocodeResult
+          const placeDetails = extractBiggerAreaFromGeocodeResult(result);
+          resolve({
+            ...placeDetails,
+            placeID,
+            description: placeDetails.description,
+          });
+        } else {
+          reject(
+            new Error(
+              `Failed to get place details. Status: ${status}, Result is null: ${result === null}`,
+            ),
+          );
+        }
+      });
+    });
+  });
 };
