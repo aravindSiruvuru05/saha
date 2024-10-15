@@ -6,6 +6,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { SwapButton } from '@/components/ui/commonComponents/SwapButton';
 import { GoogleSearchCommandInput } from '@/components/ui/commonComponents/GoogleSearchCommandInput';
 import { IPlaceDetails } from '@/utils/google_places';
+import { APP_LABELS } from '@/utils/labels';
 
 export const RidesSearch = () => {
   const [fromLocation, setFromLocation] = useState<IPlaceDetails | null>(null);
@@ -38,10 +39,16 @@ export const RidesSearch = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-3 mb-4">
             <div className="flex gap-3">
-              <GoogleSearchCommandInput onSelect={p => setFromLocation(p)} />
+              <GoogleSearchCommandInput
+                placeholder={APP_LABELS.startLocaitonPlaceholder}
+                onSelect={p => setFromLocation(p)}
+              />
               <SwapButton onSwapLocations={handleSwapLocations} />
             </div>
-            <GoogleSearchCommandInput onSelect={p => setToLocation(p)} />
+            <GoogleSearchCommandInput
+              placeholder={APP_LABELS.destinationPlaceholder}
+              onSelect={p => setToLocation(p)}
+            />
             <DatePicker value={rideDate} onChange={val => setRideDate(val)} />
           </div>
           <Button type="submit" className="w-full">

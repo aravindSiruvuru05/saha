@@ -13,8 +13,8 @@ import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '../ui/alert';
 import { useDispatch } from 'react-redux';
 import { setUser } from '@/store/userSlice';
-import { IonItem, useIonRouter } from '@ionic/react';
-import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
+import { useIonRouter } from '@ionic/react';
+import { APP_LABELS } from '@/utils/labels';
 
 export const Signin = () => {
   const [email, setEmail] = useState('');
@@ -24,11 +24,6 @@ export const Signin = () => {
   const router = useIonRouter(); // Use IonRouter for navigation
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    // Set Keyboard Resize Mode to 'none'
-    Keyboard.setResizeMode({ mode: KeyboardResize.None });
-    Keyboard.setAccessoryBarVisible({ isVisible: false });
-  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +58,7 @@ export const Signin = () => {
                 id="email"
                 type="email"
                 required
+                placeholder={APP_LABELS.emailPlaceholder}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
@@ -72,6 +68,7 @@ export const Signin = () => {
               <Input
                 id="password"
                 type="password"
+                placeholder={APP_LABELS.passwordPlaceholder}
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -84,7 +81,7 @@ export const Signin = () => {
               </Alert>
             )}
             <Button type="submit" className="w-full">
-              {isCreating ? 'Loadinng...' : 'Sign In'}
+              {isCreating ? APP_LABELS.loadingLabel : APP_LABELS.signinLabel}
             </Button>
           </form>
 

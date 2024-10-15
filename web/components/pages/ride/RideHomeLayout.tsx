@@ -98,7 +98,7 @@ export const RideHomeLayout = () => {
             }`}
           >
             <Search className="h-6 w-6" />
-            <span className="text-xs mt-1">Search</span>
+            <span className="text-sm mt-1">Search</span>
           </button>
           <button
             onClick={() => setActiveTab('publish')}
@@ -111,7 +111,7 @@ export const RideHomeLayout = () => {
             <div className="bg-primary text-primary-foreground rounded-full p-3 -mt-6">
               <Plus className="h-6 w-6" />
             </div>
-            <span className="text-xs mt-1">Publish</span>
+            <span className="text-sm mt-1">Publish</span>
           </button>
           <button
             onClick={() => setActiveTab('my-rides')}
@@ -122,7 +122,7 @@ export const RideHomeLayout = () => {
             }`}
           >
             <Route className="h-6 w-6" />
-            <span className="text-xs mt-1">My Rides</span>
+            <span className="text-sm mt-1">My Rides</span>
           </button>
         </nav>
       </footer>

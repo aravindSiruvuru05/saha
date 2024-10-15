@@ -17,6 +17,7 @@ import { Combobox } from '@/components/ui/combobox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { SingleSelect } from '@/components/ui/commonComponents/SingleSelect';
 import { GoogleSearchCommandInput } from '@/components/ui/commonComponents/GoogleSearchCommandInput';
+import { APP_LABELS } from '@/utils/labels';
 
 const locations = [
   { value: 'newyork' },
@@ -80,9 +81,11 @@ export const PublishRideForm = () => {
             <>
               <div className="flex flex-col md:flex-row gap-3">
                 <GoogleSearchCommandInput
+                  placeholder={APP_LABELS.startLocaitonPlaceholder}
                   onSelect={place => console.log(place)}
                 />
                 <GoogleSearchCommandInput
+                  placeholder={APP_LABELS.destinationPlaceholder}
                   onSelect={place => console.log(place)}
                 />
               </div>

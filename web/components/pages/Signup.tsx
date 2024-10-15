@@ -13,6 +13,7 @@ import { useSignupMutation } from '@/store/apiSlice';
 import { useIonRouter } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import { AlertDialog } from '@/components/ui/commonComponents/AlertDialog';
+import { APP_LABELS } from '@/utils/labels';
 
 export const Signup = () => {
   const [name, setName] = useState('');
@@ -66,6 +67,7 @@ export const Signup = () => {
               <Input
                 id="name"
                 type="text"
+                placeholder={APP_LABELS.namePlaceholder}
                 required
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -76,6 +78,7 @@ export const Signup = () => {
               <Input
                 id="email"
                 type="email"
+                placeholder={APP_LABELS.emailPlaceholder}
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -86,6 +89,7 @@ export const Signup = () => {
               <Input
                 id="password"
                 type="password"
+                placeholder={APP_LABELS.passwordPlaceholder}
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -96,6 +100,7 @@ export const Signup = () => {
               <Input
                 id="confirmPassword"
                 type="password"
+                placeholder={APP_LABELS.confirmPasswordPlaceholder}
                 required
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
@@ -108,7 +113,7 @@ export const Signup = () => {
               </Alert>
             )}
             <Button type="submit" className="w-full" disabled={isCreating}>
-              {isCreating ? 'Loading...' : 'Sign Up'}
+              {isCreating ? APP_LABELS.loadingLabel : APP_LABELS.signupLabel}
             </Button>
           </form>
 
