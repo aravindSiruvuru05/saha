@@ -47,11 +47,11 @@ exports.up = (pgm) => {
       },
       onDelete: 'RESTRICT', // Prevent deletion if referenced
     },
-    total_seats_available: {
+    actual_seats: {
       type: 'integer',
       notNull: true,
     },
-    total_seats_filled: {
+    seats_filled: {
       type: 'integer',
       default: 0,
       notNull: true,
@@ -62,6 +62,12 @@ exports.up = (pgm) => {
     },
     end_time: {
       type: 'timestamptz',
+    },
+    price: {
+      type: 'integer',
+    },
+    car_model: {
+      type: 'varchar',
     },
     created_at: {
       type: 'timestamptz',
