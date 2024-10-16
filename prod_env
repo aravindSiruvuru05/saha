@@ -1,9 +1,10 @@
-NODE_ENV=development
 DB_PASSWORD=12345
 DB_USER=postgres
-DB_NAME=saha_local
+DB_NAME=saha_prod
+NODE_ENV=production
+DB_HOST=db
 SERVER_PORT=8080
 JWT_SECRET=my-very-long-secret-so-that-no-one-can-steal
 JWT_EXPIRES_IN=90d
-DATABASE_URL=postgres://postgres:12345@localhost:5432/saha_local
+# DATABASE_URL=postgres://postgres:12345@localhost:5432/saha_prod
 GOOGLE_MAPS_API_KEY=AIzaSyB8WhOZ11Lnt4V6WzpdlkE_WcpdkEjMdj4

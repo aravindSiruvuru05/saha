@@ -24,7 +24,7 @@ WORKDIR /app
 
 # Copy the built application from the build stage
 COPY --from=build /app/dist ./dist 
-COPY .env .env
+# COPY .env .env - loading from docker compose
 COPY ./migrations ./migrations
 # Copy package.json and yarn.lock to install production dependencies
 COPY package*.json ./
