@@ -4,10 +4,16 @@ services:
   api:
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - NODE_ENV=production
     restart: on-failure
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      SERVER_PORT: ${SERVER_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
     build:
       context: ./api
       dockerfile: Dockerfile.prod

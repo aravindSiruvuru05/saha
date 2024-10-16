@@ -2,7 +2,9 @@
 
 export COMPOSE_FILE=docker-compose.yml
 export ENV_FILE=local_env
+export PROD_ENV_FILE=prod_env
 
+#  later this prod env file need to be removed in code base and directly injected at time of containerisation in server 
 if [[ "$1" = "up" ]]; then
     if [ "$(docker-compose ps -q)" ]; then
             echo "Stopping and removing existing containers..."
@@ -15,8 +17,9 @@ if [[ "$1" = "up" ]]; then
         docker-compose -f $COMPOSE_FILE --env-file ${ENV_FILE} up api.debug db
     elif [ "$2" = "prod" ]; then
         echo "Starting Application in PRODUCTION MODE...";
-        docker-compose -f docker-compose.prod.yml --env-file ${ENV_FILE} build api
-        docker-compose -f docker-compose.prod.yml --env-file ${ENV_FILE} up api db
+        # later remove this prod env file and this shuld be injected to containers in the instace level without any prod env files in code base
+        docker-compose -f docker-compose.prod.yml --env-file ${PROD_ENV_FILE} build api
+        docker-compose -f docker-compose.prod.yml --env-file ${PROD_ENV_FILE} up api db
     else
         echo "Starting Application...";
         docker-compose -f $COMPOSE_FILE --env-file ${ENV_FILE} up

@@ -17,12 +17,17 @@ services:
   api:
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
     build:
       context: ./api
-    # env_file:
-    #   - ./api/.env
+    environment:
+        NODE_ENV: ${NODE_ENV}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        DB_NAME: ${DB_NAME}
+        DB_HOST: ${DB_HOST}
+        SERVER_PORT: ${SERVER_PORT}
+        JWT_SECRET: ${JWT_SECRET}
+        JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
     ports:
       - "8080:8080" 
     volumes:
