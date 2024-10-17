@@ -2,7 +2,7 @@
 
 export COMPOSE_FILE=docker-compose.yml
 export ENV_FILE=.env
-export PROD_ENV_FILE=.env.prod
+export PROD_ENV_FILE=.env.production
 
 #  later this prod env file need to be removed in code base and directly injected at time of containerisation in server 
 if [[ "$1" = "up" ]]; then
