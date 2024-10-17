@@ -27,7 +27,7 @@ pool.on('remove', (client) => {
 })
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err)
+  console.error('Unexpected error on idle client.', err)
 })
 
 pool.connect(async (err, client, release) => {
