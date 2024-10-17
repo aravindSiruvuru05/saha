@@ -68,4 +68,13 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
     const result = await this.pool.query(query)
     return result.rows
   }
+
+  protected async findAllByColumn(
+    columnName: string,
+    value: any,
+  ): Promise<R[]> {
+    const query = `SELECT * FROM ${this.tableName} WHERE ${columnName} = $1`
+    const result = await this.pool.query(query, [value])
+    return result.rows
+  }
 }

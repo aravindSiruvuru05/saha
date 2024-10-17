@@ -4,30 +4,7 @@ import catchAsync from '../../../shared/utils/catchAsync'
 import { findByID } from '../../serviceHandlers/auth.service'
 import { User } from '../../domain/user'
 import AppError from '../../../shared/utils/appError'
-// import { IUser, User } from '../../domain/user'
 
-// export const createUser = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const newUser = await req.models.user.create(req.body)
-
-//     res.status(201).json({
-//       status: 'SUCCESS',
-//       data: {
-//         user: newUser,
-//       },
-//     })
-//   },
-// )
-
-// export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-//   const users = await req.models.user.getAll()
-//   res.status(200).json({
-//     status: 'SUCCESS',
-//     data: {
-//       users,
-//     },
-//   })
-// })
 export const getUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     let user: User | null

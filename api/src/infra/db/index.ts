@@ -10,6 +10,7 @@ const DB_CONFIG = {
   password: process.env.DB_PASSWORD,
   port: 5432,
 }
+console.log(DB_CONFIG, '====')
 // Create a connection pool
 const pool = new Pool(DB_CONFIG)
 

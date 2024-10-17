@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export COMPOSE_FILE=docker-compose.yml
-export ENV_FILE=local_env
-export PROD_ENV_FILE=prod_env
+export ENV_FILE=.env
+export PROD_ENV_FILE=.env.prod
 
 #  later this prod env file need to be removed in code base and directly injected at time of containerisation in server 
 if [[ "$1" = "up" ]]; then

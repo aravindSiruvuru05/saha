@@ -45,8 +45,8 @@ export class UserRepository extends BaseRepository<IUserEntity> {
   }
 
   public async findByEmail(email: string): Promise<User | null> {
-    const query = `SELECT * FROM ${this.tableName} WHERE email = $1`
-    const result = await this.pool.query(query, [email])
-    return result?.rows[0] ? this.fromRow(result.rows[0]) : null
+    const rows = await super.findAllByColumn('email', email)
+    console.log(rows, '===')
+    return !!rows[0] ? this.fromRow(rows[0]) : null
   }
 }

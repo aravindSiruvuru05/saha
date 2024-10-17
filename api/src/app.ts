@@ -5,12 +5,15 @@ import cors from 'cors' // Import the cors package
 import AppError from './shared/utils/appError'
 import { router as userRouter } from './infra/routers/user.router'
 import authRouter from './infra/routers/auth.router'
+import postRouter from './infra/routers/post.router'
 import googleRouter from './infra/routers/googleMaps.router'
 import globalErrorHandler from './internal/adapters/controllers/error.controller'
 import pool from './infra/db'
 import { User } from './internal/domain/user'
 import { UserRepository } from './internal/adapters/repositories/user.repository'
 import { protect } from './internal/adapters/controllers/auth.controller'
+import { Ride } from './internal/domain/ride'
+import { RideRepository } from './internal/adapters/repositories/ride.repository'
 
 const app = express()
 
@@ -31,7 +34,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`REQUEST QUERY PARAMS:::::> ${JSON.stringify(req.query)}`)
   next()
 })
-const userRepository = new UserRepository(pool)
 
 export const injectModels = (
   req: Request,
@@ -40,9 +42,11 @@ export const injectModels = (
 ) => {
   req.models = {
     user: new User(),
+    ride: new Ride(),
   }
   req.repositories = {
-    user: userRepository,
+    user: new UserRepository(pool),
+    ride: new RideRepository(pool),
   }
   next()
 }
@@ -50,6 +54,7 @@ app.use(injectModels)
 // Route handlers
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', protect, userRouter)
+app.use('/api/v1/posts', protect, postRouter)
 app.use('/api/v1/google', protect, googleRouter)
 
 // Handle undefined routes
