@@ -29,7 +29,7 @@ fi
 if [ "$1" = "run" ]; then
     if [ "$2" = "build" ]; then
         if [ "$3" = "debugger" ]; then
-            echo "Building Debugger...";
+            echo "Building Debugger..";
             docker-compose -f $COMPOSE_FILE --env-file ${ENV_FILE} build api.debug
         else
             echo "Building Application...";
