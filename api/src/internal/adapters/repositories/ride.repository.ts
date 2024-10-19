@@ -13,20 +13,56 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       id: row.id,
       userId: row.user_id,
       type: IRideType.RIDE,
-      details: row.details,
-      content: {
-        startLocationId: row.start_location_id,
-        endLocationId: row.end_location_id,
-        totalSeatsAvailable: row.total_seats_available,
-        totalSeatsFilled: row.total_seats_filled,
+      about: row.details,
+      details: {
+        startLocationID: row.start_location_id,
+        endLocationID: row.end_location_id,
+        actualSeats: row.actual_seats,
+        seatsFilled: row.seats_filled,
         startTime: row.start_time,
-        endTime: row.end_time,
+        duration: row.end_time,
       },
     })
   }
 
-  public async create(item: Omit<IPost<IRide>, 'id'>): Promise<Ride | null> {
-    const row = await super.create(item)
+  private toRow(ride: Partial<IPost<Partial<IRide>>>): Partial<QueryResultRow> {
+    const row: Partial<QueryResultRow> = {}
+
+    if (ride.id !== undefined) {
+      row.id = ride.id
+    }
+    if (ride.userId !== undefined) {
+      row.user_id = ride.userId
+    }
+    if (ride.about !== undefined) {
+      row.about = ride.about
+    }
+    if (ride.details?.startLocationID !== undefined) {
+      row.start_location_id = ride.details.startLocationID
+    }
+    if (ride.details?.endLocationID !== undefined) {
+      row.end_location_id = ride.details.endLocationID
+    }
+    if (ride.details?.actualSeats !== undefined) {
+      row.actual_seats = ride.details.actualSeats
+    }
+    if (ride.details?.seatsFilled !== undefined) {
+      row.total_seats_filled = ride.details.seatsFilled
+    }
+    if (ride.details?.startTime !== undefined) {
+      row.start_time = ride.details.startTime
+    }
+    if (ride.details?.duration !== undefined) {
+      row.end_time = ride.details.duration
+    }
+
+    return row
+  }
+
+  public async create(
+    item: Omit<IPost<Omit<IRide, 'seatsFilled'>>, 'id' | 'type'>,
+  ): Promise<Ride | null> {
+    const row = await super.create(this.toRow(item))
     return row ? this.fromRow(row) : null
   }
 

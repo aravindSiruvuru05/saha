@@ -17,6 +17,9 @@ exports.up = (pgm) => {
       primaryKey: true, // Set as primary key
       default: pgm.func('gen_random_uuid()'), // Generates a random UUID
     },
+    google_location_id: {
+      type: 'text',
+    },
     name: {
       type: 'text',
       notNull: true, // Ensure the name of the location is provided

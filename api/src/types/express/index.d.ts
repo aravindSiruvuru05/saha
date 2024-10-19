@@ -1,4 +1,5 @@
 // express.d.ts
+import { LocationRepository } from '../../internal/adapters/repositories/location.repository'
 import { RideRepository } from '../../internal/adapters/repositories/ride.repository'
 import { UserRepository } from '../../internal/adapters/repositories/user.repository'
 import { Ride } from '../../internal/domain/ride'
@@ -16,6 +17,7 @@ declare global {
       repositories: {
         user: UserRepository
         ride: RideRepository
+        location: LocationRepository
       }
     }
   }

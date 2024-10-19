@@ -46,7 +46,6 @@ export class UserRepository extends BaseRepository<IUserEntity> {
 
   public async findByEmail(email: string): Promise<User | null> {
     const rows = await super.findAllByColumn('email', email)
-    console.log(rows, '===')
     return !!rows[0] ? this.fromRow(rows[0]) : null
   }
 }

@@ -12,8 +12,8 @@ exports.up = (pgm) => {
   // Create the enum type for booking status
   pgm.createType('booking_status_enum', ['pending', 'confirmed', 'rejected'])
 
-  // Create user_rides table for ride bookings
-  pgm.createTable('user_rides', {
+  // Create ride_requests table for ride bookings
+  pgm.createTable('ride_requests', {
     id: {
       type: 'uuid',
       notNull: true,
@@ -59,10 +59,10 @@ exports.up = (pgm) => {
     },
   })
 
-  // Create the trigger for the user_rides table
+  // Create the trigger for the ride_requests table
   pgm.sql(`
-   CREATE TRIGGER set_updated_at_user_rides
-   BEFORE UPDATE ON user_rides
+   CREATE TRIGGER set_updated_at_ride_requests
+   BEFORE UPDATE ON ride_requests
    FOR EACH ROW
    EXECUTE FUNCTION update_updated_at_column();
   `)
@@ -75,9 +75,11 @@ exports.up = (pgm) => {
  */
 exports.down = (pgm) => {
   // Drop the trigger first
-  pgm.sql('DROP TRIGGER IF EXISTS set_updated_at_user_rides ON user_rides;')
+  pgm.sql(
+    'DROP TRIGGER IF EXISTS set_updated_at_ride_requests ON ride_requests;',
+  )
 
-  pgm.dropTable('user_rides') // Drop user_rides table
+  pgm.dropTable('ride_requests') // Drop ride_requests table
 
   // Drop the enum type
   pgm.dropType('booking_status_enum')

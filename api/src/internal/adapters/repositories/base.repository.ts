@@ -13,7 +13,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
 
   // Create a new record
   // here the return is QueryResult but these should not be used directly to query but only used in parent class to return actual domain
-  protected async create(item: Omit<T, 'id'>): Promise<R | null> {
+  protected async create(item: QueryResultRow): Promise<R | null> {
     // Generate a UUID for the id field
     const id = uuidv4()
 
@@ -43,7 +43,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
   // Update a record by ID
   protected async update(
     id: string,
-    updatedItem: Partial<T>,
+    updatedItem: Partial<QueryResultRow>,
   ): Promise<R | null> {
     const updates = Object.keys(updatedItem)
       .map((key, index) => `${key} = $${index + 1}`)
@@ -63,7 +63,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
   }
 
   // Get all records
-  protected async getAll(): Promise<R[]> {
+  protected async getAll(): Promise<QueryResultRow[]> {
     const query = `SELECT * FROM ${this.tableName}`
     const result = await this.pool.query(query)
     return result.rows
@@ -72,7 +72,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
   protected async findAllByColumn(
     columnName: string,
     value: any,
-  ): Promise<R[]> {
+  ): Promise<QueryResultRow[]> {
     const query = `SELECT * FROM ${this.tableName} WHERE ${columnName} = $1`
     const result = await this.pool.query(query, [value])
     return result.rows

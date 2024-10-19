@@ -1,6 +1,5 @@
 // src/store/apiSlice.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { UUID } from 'crypto';
 import {
   BaseQueryFn,
   FetchArgs,
@@ -8,54 +7,17 @@ import {
 } from '@reduxjs/toolkit/query';
 
 import { IPlaceDetails } from '@/utils/google_places';
-
-export interface IDistanceResponse {
-  distance: string;
-  duration: string;
-}
-
-export interface IWithID {
-  id: UUID;
-}
-export interface ISigninPayload {
-  email: string;
-  password: string;
-}
-
-export interface ISignupPayload {
-  name: string;
-  email: string;
-  password: string;
-  confirm_password: string;
-  photo?: string;
-}
-
-export enum IUserRole {
-  ADMIN,
-  MEMBER,
-}
-
-export interface IUserResult extends IWithID {
-  name: string;
-  email: string;
-  role: IUserRole;
-}
-export interface ISigninResult {
-  token: string;
-  user: IUserResult;
-}
-
-export interface IApiResponse<T> {
-  data: T;
-}
-export interface ISignupResult {
-  token: string;
-}
-
-export interface IDistanceResponse {
-  distance: string;
-  duration: string;
-}
+import {
+  IApiResponse,
+  ICreateRideRequest,
+  IDistanceResponse,
+  IPost,
+  IRide,
+  ISigninPayload,
+  ISigninResult,
+  ISignupPayload,
+  ISignupResult,
+} from './types';
 
 export const prepareAuthorizationHeader = (): Record<string, string> => {
   const token = localStorage.getItem('AccessToken');
@@ -95,7 +57,6 @@ const baseQueryWithReauth: BaseQueryFn<
   });
 
   const result = await baseQuery(args, api, extraOptions);
-  console.log(api.endpoint, '====');
   if (
     result.error &&
     result.error.status === 401 &&
@@ -120,10 +81,7 @@ export const apiSlice = createApi({
     // getPostById: builder.query<Post, number>({
     //   query: id => `posts/${id}`, // Fetch a single post by ID
     // }),
-    signin: builder.mutation<
-      IApiResponse<ISigninResult>,
-      Partial<ISigninPayload>
-    >({
+    signin: builder.mutation<ISigninResult, Partial<ISigninPayload>>({
       query: data => ({
         url: 'api/v1/auth/signin',
         method: 'POST',
@@ -134,10 +92,10 @@ export const apiSlice = createApi({
         if (token) {
           localStorage.setItem('AccessToken', token);
         }
-        return rawRes;
+        return rawRes.data;
       },
     }),
-    signup: builder.mutation<IApiResponse<ISignupResult>, ISignupPayload>({
+    signup: builder.mutation<ISignupResult, ISignupPayload>({
       query: data => ({
         url: 'api/v1/auth/signup',
         method: 'POST',
@@ -148,7 +106,17 @@ export const apiSlice = createApi({
         if (token) {
           localStorage.setItem('AccessToken', token);
         }
-        return rawRes;
+        return rawRes.data;
+      },
+    }),
+    createPost: builder.mutation<IPost<IRide>, ICreateRideRequest>({
+      query: data => ({
+        url: 'api/v1/posts/ride',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (rawRes: IApiResponse<IPost<IRide>>) => {
+        return rawRes.data;
       },
     }),
     distanceDetails: builder.query({
@@ -185,4 +153,5 @@ export const {
   useDistanceDetailsQuery,
   useLazyPlaceDetailsQuery,
   usePlaceDetailsQuery,
+  useCreatePostMutation,
 } = apiSlice;

@@ -28,13 +28,13 @@ export const Signin = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await signin({
+      const resData = await signin({
         email,
         password,
       }).unwrap();
       // Redirect to the protected route
-      if (res.data.token) {
-        dispatch(setUser({ token: res.data.token, user: res.data.user }));
+      if (resData.token) {
+        dispatch(setUser({ token: resData.token, user: resData.user }));
         router.push('/');
       } else setApiError('something went wrong');
     } catch (e: any) {

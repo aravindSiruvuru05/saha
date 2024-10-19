@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   CommandDialog,
@@ -20,22 +20,31 @@ import {
   getPlaceDetailsByPlaceID,
 } from '@/utils/google_places';
 import { Spinner } from './Spinner';
+import { Label } from '../label';
 
 interface IGoogleSearchCommandInput {
+  label?: string;
+  value?: string;
   onSelect: (place: IPlaceDetails) => void;
   placeholder: string;
 }
 
 export const GoogleSearchCommandInput = ({
+  value,
+  label,
   onSelect,
   placeholder,
 }: IGoogleSearchCommandInput) => {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(value);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [suggestions, setSuggestions] = useState<
     google.maps.places.AutocompletePrediction[]
   >([]);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   const handleInputChange = useDebouncedCallback(async (e: any) => {
     const val = e.target.value;
@@ -98,6 +107,7 @@ export const GoogleSearchCommandInput = ({
 
   return (
     <div className="w-[100%]">
+      <Label htmlFor="date">{label}</Label>
       <div className="flex items-center border rounded-md shadow-sm bg-white gap-2 w-full max-w-[400px]">
         <MapPin className="ml-2 text-gray-500 h-4 w-4" />
         <Input
