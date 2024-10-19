@@ -1,9 +1,10 @@
+import { UUID } from 'crypto'
 import { IWithId } from './types'
 
 export abstract class BaseModel<T extends IWithId> {
-  public id!: string
+  public id!: UUID
 
-  constructor(id: string | null) {
+  constructor(id: UUID | null) {
     if (!id) return
     this.id = id
   }

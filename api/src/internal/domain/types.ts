@@ -29,24 +29,23 @@ export interface ILocation extends IWithId {
 }
 export interface IPost<T = unknown> extends IWithId {
   userId: string
-  details?: string
-  content: T
+  details: T
+  about: string
   type: IRideType
 }
 
 export interface IRide {
-  details?: string
-  startLocationId: string
-  endLocationId: string
-  totalSeatsAvailable: number
-  totalSeatsFilled: number
+  startLocationID: UUID
+  endLocationID: UUID
+  actualSeats: number
+  seatsFilled: number
   startTime: Date
-  endTime?: Date
+  duration: number
 }
 
 export interface IUserRide extends IWithId {
-  rideId: string
-  userId: string
+  rideId: UUID
+  userId: UUID
   status: BookingStatus
 }
 

@@ -26,7 +26,7 @@ exports.up = (pgm) => {
       },
       onDelete: 'CASCADE', // Optional: specify behavior on delete
     },
-    details: {
+    about: {
       type: 'varchar',
     },
     start_location_id: {
@@ -60,8 +60,8 @@ exports.up = (pgm) => {
       type: 'timestamptz',
       notNull: true, // Start time of the trip
     },
-    end_time: {
-      type: 'timestamptz',
+    duration: {
+      type: 'integer',
     },
     price: {
       type: 'integer',
