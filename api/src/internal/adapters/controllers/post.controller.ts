@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import catchAsync from '../../../shared/utils/catchAsync'
 import AppError from '../../../shared/utils/appError'
 import { STATUS_CODES } from '../../../shared/utils'
-import { parseISO } from 'date-fns'
+import { toZonedTime } from 'date-fns-tz'
 import { ICreateRideRequest, IGetRidesReq } from './types'
 import { getPlaceDetails } from '../../serviceHandlers/google.service'
 
@@ -49,7 +49,14 @@ export const createPost = catchAsync(
         new AppError('error creating locations', STATUS_CODES.BAD_REQUEST),
       )
     }
-
+    // const localDate = new Date(startTime.dateTimeValue)
+    // console.log(localDate, 'local====')
+    // Convert to UTC using the user's timezone
+    // const startUtc = toZonedTime(localDate, startTime.userTZ, {
+    //   timeZone: 'UTC',
+    // })
+    // console.log(startUtc, 'startUtc====')
+    console.log(startTime.dateTimeValue, '-----')
     const newRide = await req.repositories.ride.create({
       user: { id: req.currUser.id },
       about: about,
@@ -57,7 +64,7 @@ export const createPost = catchAsync(
         fromLocationID: startLocation.googlePlaceID,
         toLocationID: endLocation.googlePlaceID,
         actualSeats,
-        startTime: parseISO(startTime),
+        startTime: startTime.dateTimeValue,
         duration: duration,
       },
     })
@@ -123,7 +130,6 @@ export const findRides = catchAsync(
       toLocation,
       startDate,
     })
-
     if (!rides || rides.length === 0) {
       return res.status(STATUS_CODES.OK).json({
         data: {

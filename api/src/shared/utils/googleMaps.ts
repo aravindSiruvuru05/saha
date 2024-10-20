@@ -98,10 +98,14 @@ class GoogleMapsService {
         params: {
           place_id: googlePlaceId,
           key: process.env.GOOGLE_MAPS_API_KEY!,
-          fields: ['name', 'formatted_address', 'address_components'],
+          fields: [
+            'name',
+            'formatted_address',
+            'address_components',
+            'place_id',
+          ],
         },
       })
-      console.log(response.data, 'google res ======')
       if (
         response.data.status === 'OK' &&
         response.data.result.formatted_address

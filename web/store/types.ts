@@ -76,12 +76,17 @@ export interface IRide {
   endTime?: string;
 }
 
+interface IStartTime {
+  dateTimeValue: string;
+  userTZ: string;
+}
+
 export interface ICreateRideRequest {
   about: string;
   fromLocation: IPlaceDetails;
   toLocation: IPlaceDetails;
   actualSeats: number;
-  startTime: string;
+  startTime: IStartTime;
 }
 
 export interface IFindRidesReqQuery {

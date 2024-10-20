@@ -16,7 +16,7 @@ interface IRideEntity {
   toLocationID: string
   actualSeats: number
   seatsFilled: number
-  startTime: Date
+  startTime: string
   duration: number
 }
 export class RideRepository extends BaseRepository<IPost<IRide>> {
@@ -167,8 +167,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       toLocation.neighborhood,
       toLocation.locality,
       toLocation.city,
-    ]
-
+    ];
+  
     let query = `
       SELECT r.*, 
              u.id AS user_id, 
@@ -194,19 +194,25 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         OR (startLoc.locality = $2 AND endLoc.city = $6)
         OR (startLoc.city = $3 AND endLoc.city = $6)
       )
-    `
-
+    `;
+  
     if (startDate) {
-      // Assuming startDate is in ISO format, extract the date part and set time range for the entire day
-      const datePart = startDate.split('T')[0] // Extracts '2024-10-09'
-      const startDateTime = `${datePart}T00:00:00.000Z` // Start of the day
-      const endDateTime = `${datePart}T23:59:59.999Z` // End of the day
-
-      query += ` AND r.start_time >= $7 AND r.start_time <= $8`
-      params.push(startDateTime, endDateTime)
+      // Assuming startDate is in ISO format (UTC), we want to find rides for the whole day of 2024-10-25 in IST.
+      const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+      const startDateInUTC = new Date(new Date(startDate).getTime() - istOffset); // Convert to UTC
+      const endDateInUTC = new Date(startDateInUTC.getTime() + 24 * 60 * 60 * 1000 - 1); // End of the day
+  
+      const startDateTime = startDateInUTC.toISOString(); // Convert back to ISO string
+      const endDateTime = endDateInUTC.toISOString(); // Convert back to ISO string
+  
+      console.log(startDateTime, endDateTime, startDate, '======---');
+  
+      query += ` AND r.start_time >= $7 AND r.start_time <= $8`;
+      params.push(startDateTime, endDateTime);
     }
-
-    const { rows } = await this.pool.query(query, params)
-    return rows.map(this.fromRow)
+  
+    const { rows } = await this.pool.query(query, params);
+    return rows.map(this.fromRow);
   }
+  
 }

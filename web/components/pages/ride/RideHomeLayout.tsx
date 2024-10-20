@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -19,11 +19,21 @@ import images from '../../../assets/images/free-cars-white.webp';
 import { useIonRouter } from '@ionic/react';
 
 export const RideHomeLayout = () => {
+  const query = new URLSearchParams(location.search);
+
+  const backhome = query.get('backhome');
   const [activeTab, setActiveTab] = useState('ride-search');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const router = useIonRouter(); // Use IonRouter for navigation
 
+  useEffect(() => {
+    if (backhome) {
+      setActiveTab('ride-search');
+      console.log(backhome, '====');
+      query.set('backhome', 'false');
+    }
+  }, [backhome]);
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="bg-primary text-primary-foreground pb-4 px-4 py-4 fixed top-0 left-0 right-0 z-10 flex items-center justify-between shadow-lg">
