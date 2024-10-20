@@ -38,10 +38,6 @@ exports.up = (pgm) => {
       },
       onDelete: 'CASCADE', // If the user is deleted, cascade the deletion
     },
-    // seats_booked: {
-    //   type: 'integer',
-    //   notNull: true, // Number of seats booked
-    // },
     status: {
       type: 'booking_status_enum', // Use the enum type for status
       notNull: true,

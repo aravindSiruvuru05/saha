@@ -11,6 +11,8 @@ import {
   IApiResponse,
   ICreateRideRequest,
   IDistanceResponse,
+  IFindRidesReqQuery,
+  IFindRidesRes,
   IPost,
   IRide,
   ISigninPayload,
@@ -111,12 +113,33 @@ export const apiSlice = createApi({
     }),
     createPost: builder.mutation<IPost<IRide>, ICreateRideRequest>({
       query: data => ({
-        url: 'api/v1/posts/ride',
+        url: 'api/v1/posts/rides',
         method: 'POST',
         body: data,
       }),
       transformResponse: (rawRes: IApiResponse<IPost<IRide>>) => {
         return rawRes.data;
+      },
+    }),
+    findRides: builder.query<IFindRidesRes, IFindRidesReqQuery>({
+      query: params => ({
+        url: 'api/v1/posts/find-rides',
+        params,
+      }),
+      transformResponse: (rawRes: IApiResponse<IFindRidesRes>) => {
+        return rawRes.data;
+      },
+    }),
+    getMyRides: builder.query<IFindRidesRes['rides'], any>({
+      query: () => ({
+        url: 'api/v1/posts/rides',
+      }),
+      transformResponse: (
+        rawRes: IApiResponse<
+          Omit<IFindRidesRes, 'fromLocation' | 'toLocation'>
+        >,
+      ): IFindRidesRes['rides'] => {
+        return rawRes.data.rides;
       },
     }),
     distanceDetails: builder.query({
@@ -152,6 +175,7 @@ export const {
   useLazyDistanceDetailsQuery,
   useDistanceDetailsQuery,
   useLazyPlaceDetailsQuery,
-  usePlaceDetailsQuery,
+  useFindRidesQuery,
+  useGetMyRidesQuery,
   useCreatePostMutation,
 } = apiSlice;

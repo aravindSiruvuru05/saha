@@ -22,10 +22,10 @@ export const RidesSearch = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (fromLocation && toLocation) {
+    if (fromLocation && toLocation && rideDate) {
       try {
         router.push(
-          `/search-listings?from=${encodeURIComponent(fromLocation.placeID)}&to=${encodeURIComponent(toLocation.placeID)}`,
+          `/search-listings?from=${encodeURIComponent(fromLocation.googlePlaceID)}&to=${encodeURIComponent(toLocation.googlePlaceID)}&date=${encodeURIComponent(rideDate?.toISOString())}`,
         );
       } catch (e) {
         console.error('Failed to fetch distance matrix', e);

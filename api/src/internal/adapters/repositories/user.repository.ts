@@ -26,6 +26,7 @@ export class UserRepository extends BaseRepository<IUserEntity> {
       name: row.name,
       email: row.email,
       photo: row.photo,
+      pic: row.pic,
       role: row.role,
       password: row.password,
       passwordChangedAt: row.password_changed_at

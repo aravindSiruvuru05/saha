@@ -21,6 +21,7 @@ import { APP_LABELS } from '@/utils/labels';
 import { IPlaceDetails } from '@/utils/google_places';
 import { useCreatePostMutation } from '@/store/apiSlice';
 import { start } from 'repl';
+import { useIonRouter } from '@ionic/react';
 
 const locations = [
   { value: 'newyork' },
@@ -52,6 +53,7 @@ export const PublishRideForm = () => {
   const [availableSeats, setAvailableSeats] = useState<string>('');
   const [createPost, { isLoading: isCreating, error }] =
     useCreatePostMutation();
+  const router = useIonRouter();
   const [disableSubmit, setDisableSubmit] = useState(false);
   // const isSmallScreen = useMediaQuery({ query: '(min-width: 640px)' });
   // const isMediumScreen = useMediaQuery({ query: '(min-width: 768px)' });
@@ -104,13 +106,16 @@ export const PublishRideForm = () => {
       try {
         // setDisableSubmit(true);
         const res = await createPost({
-          start_location: fromLocation.description,
-          end_location: toLocation.description,
+          fromLocation,
+          toLocation,
           about: '',
-          actual_seats: parseInt(availableSeats, 10),
-          start_time: combineDateAndTime(rideDate, startTime) || '',
+          actualSeats: parseInt(availableSeats, 10),
+          startTime: combineDateAndTime(rideDate, startTime) || '',
         }).unwrap();
-      } catch (e) {}
+        router.push('/', 'root', 'replace');
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 

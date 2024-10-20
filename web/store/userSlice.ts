@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ISigninResult, IUserRole } from './apiSlice';
+import { ISigninResult, IUserRole } from './types';
 
 // Define the initial state for the user
 interface UserState {

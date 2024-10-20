@@ -7,6 +7,7 @@ export class User extends BaseModel<IUser> {
 
   public name!: string
   public email!: string
+  public pic!: string
   public photo!: string | null
   public role!: IUserRole
   public password?: string
@@ -18,6 +19,7 @@ export class User extends BaseModel<IUser> {
     this.name = user.name
     this.email = user.email
     this.photo = user.photo
+    this.pic = user.pic
     this.role = user.role
     this.password = user.password
     this.passwordChangedAt = user.passwordChangedAt

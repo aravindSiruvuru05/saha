@@ -1,4 +1,5 @@
 import { UUID } from 'crypto'
+import { ILocation } from '../adapters/controllers/types'
 
 export enum IUserRole {
   ADMIN,
@@ -14,6 +15,7 @@ export interface IUser extends IWithId {
   name: string
   email: string
   photo: string
+  pic: string
   role: IUserRole
   password: string
   passwordChangedAt?: Date
@@ -24,22 +26,19 @@ export enum IRideType {
   HOUSE_ACCOMDATION = 'HOUSE_ACCOMDATION',
 }
 
-export interface ILocation extends IWithId {
-  name: string
-}
 export interface IPost<T = unknown> extends IWithId {
-  userId: string
+  user: Partial<IUser>
   details: T
   about: string
   type: IRideType
 }
 
 export interface IRide {
-  startLocationID: UUID
-  endLocationID: UUID
+  fromLocation: ILocation
+  toLocation: ILocation
   actualSeats: number
   seatsFilled: number
-  startTime: Date
+  startTime: string
   duration: number
 }
 

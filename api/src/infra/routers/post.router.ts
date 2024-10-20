@@ -1,9 +1,14 @@
 import express from 'express'
 
-import { createPost } from '../../internal/adapters/controllers/post.controller'
+import {
+  createPost,
+  findRides,
+  getUserRides,
+} from '../../internal/adapters/controllers/post.controller'
 
 const router = express.Router()
 
-router.route('/ride').post(createPost)
+router.route('/rides').post(createPost).get(getUserRides)
+router.route('/find-rides').get(findRides)
 
 export default router

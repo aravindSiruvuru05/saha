@@ -42,7 +42,7 @@ const AppShell = () => {
               <RideHomeLayout />
             </ProtectedRoute>
             <ProtectedRoute path="/search-listings" exact>
-              <RideSearchListings />
+              <RideSearchListings   />
             </ProtectedRoute>
 
             {/* Add other protected routes here */}

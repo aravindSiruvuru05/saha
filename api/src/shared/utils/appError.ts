@@ -3,7 +3,6 @@ class AppError extends Error {
   isOperational: boolean
 
   constructor(message: string, statusCode: number) {
-    console.log(message, 'mmesa')
     super(message)
 
     this.statusCode = statusCode
