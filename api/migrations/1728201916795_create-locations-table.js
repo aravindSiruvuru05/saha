@@ -11,18 +11,19 @@ exports.shorthands = undefined
 exports.up = (pgm) => {
   // Create locations table
   pgm.createTable('locations', {
-    id: {
-      type: 'uuid',
+    google_place_id: {
+      type: 'text',
+      primaryKey: true,
       notNull: true,
-      primaryKey: true, // Set as primary key
-      default: pgm.func('gen_random_uuid()'), // Generates a random UUID
     },
-    google_location_id: {
+    neighborhood: {
       type: 'text',
     },
-    name: {
+    locality: {
       type: 'text',
-      notNull: true, // Ensure the name of the location is provided
+    },
+    city: {
+      type: 'text',
     },
     created_at: {
       type: 'timestamptz',
@@ -36,13 +37,20 @@ exports.up = (pgm) => {
     },
   })
 
-  // Create the trigger for the orders table
+  // Create indexes for the locations table
+  pgm.createIndex('locations', ['neighborhood'])
+  pgm.createIndex('locations', ['locality'])
+  pgm.createIndex('locations', ['city'])
+  // Create a composite index on neighborhood, locality, and city
+  pgm.createIndex('locations', ['neighborhood', 'locality', 'city'])
+
+  // Create the trigger for the locations table
   pgm.sql(`
     CREATE TRIGGER set_updated_at
     BEFORE UPDATE ON locations
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
-   `)
+  `)
 }
 
 /**
@@ -51,8 +59,15 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  // Drop the trigger first
+  // Drop the indexes first
+  pgm.dropIndex('locations', ['neighborhood'])
+  pgm.dropIndex('locations', ['locality'])
+  pgm.dropIndex('locations', ['city'])
+  pgm.dropIndex('locations', ['neighborhood', 'locality', 'city'])
+
+  // Drop the triggers
   pgm.sql('DROP TRIGGER IF EXISTS set_updated_at ON locations;')
 
-  pgm.dropTable('locations') // Drop locations table
+  // Drop the tables
+  pgm.dropTable('locations')
 }

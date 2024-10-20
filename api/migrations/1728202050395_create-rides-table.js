@@ -9,7 +9,7 @@ exports.shorthands = undefined
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  // Create car_pooling table with location references
+  // Create rides table with location references
   pgm.createTable('rides', {
     id: {
       type: 'uuid',
@@ -29,21 +29,21 @@ exports.up = (pgm) => {
     about: {
       type: 'varchar',
     },
-    start_location_id: {
-      type: 'uuid',
+    from_location_id: {
+      type: 'text',
       notNull: true,
       references: {
         name: 'locations', // Name of the referenced table
-        column: 'id', // Specific column in the referenced table
+        column: 'google_location_id', // Specific column in the referenced table
       },
       onDelete: 'RESTRICT', // Prevent deletion if referenced
     },
-    end_location_id: {
-      type: 'uuid',
+    to_location_id: {
+      type: 'text',
       notNull: true,
       references: {
         name: 'locations', // Name of the referenced table
-        column: 'id', // Specific column in the referenced table
+        column: 'google_place_id', // Specific column in the referenced table
       },
       onDelete: 'RESTRICT', // Prevent deletion if referenced
     },
@@ -81,12 +81,16 @@ exports.up = (pgm) => {
     },
   })
 
-  // Create the trigger for the car_pooling table
+  // Create indexes for the rides table
+  pgm.createIndex('rides', ['from_location_id'])
+  pgm.createIndex('rides', ['to_location_id'])
+
+  // Create the trigger for the rides table
   pgm.sql(`
-   CREATE TRIGGER set_updated_at
-   BEFORE UPDATE ON rides
-   FOR EACH ROW
-   EXECUTE FUNCTION update_updated_at_column();
+    CREATE TRIGGER set_updated_at
+    BEFORE UPDATE ON rides
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
   `)
 }
 
@@ -96,8 +100,13 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  // Drop the trigger first
+  // Drop the indexes first
+  pgm.dropIndex('rides', ['from_location_id'])
+  pgm.dropIndex('rides', ['to_location_id'])
+
+  // Drop the triggers
   pgm.sql('DROP TRIGGER IF EXISTS set_updated_at ON rides;')
 
-  pgm.dropTable('rides') // Drop car_pooling table
+  // Drop the tables
+  pgm.dropTable('rides')
 }

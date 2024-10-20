@@ -53,7 +53,7 @@ export const getCurrentLocationDetails = async (
 };
 
 export interface IPlaceDetails {
-  placeID: string;
+  googlePlaceID: string;
   neighborhood: string;
   locality: string;
   city: string;
@@ -79,10 +79,16 @@ export const extractBiggerAreaFromGeocodeResult = (
 
   for (const component of addressComponents) {
     const types = component.types;
-    if (types.includes('neighborhood')) {
+    if (types.includes('sublocality')) {
+      // some times if we search madhapur directly insted of exact place it comes in 1st as sublocality which is our base location
+      neighborhood = component.long_name;
+    } else if (types.includes('neighborhood')) {
       neighborhood = component.long_name;
     } else if (types.includes('locality')) {
       locality = component.long_name;
+    } else if (types.includes('administrative_area_level_3')) {
+      // we take only one of these 2 or 3
+      city = component.long_name;
     } else if (types.includes('administrative_area_level_2')) {
       city = component.long_name;
     } else if (types.includes('administrative_area_level_1')) {
@@ -93,7 +99,7 @@ export const extractBiggerAreaFromGeocodeResult = (
   }
 
   return {
-    placeID,
+    googlePlaceID: placeID,
     neighborhood,
     locality,
     city,
@@ -122,7 +128,6 @@ export const getPlaceDetailsByPlaceID = (
           const placeDetails = extractBiggerAreaFromGeocodeResult(result);
           resolve({
             ...placeDetails,
-            placeID,
             description: placeDetails.description,
           });
         } else {

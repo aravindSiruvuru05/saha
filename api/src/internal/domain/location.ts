@@ -1,13 +1,19 @@
+import { ILocation } from '../adapters/controllers/types'
 import { BaseModel } from './base.model'
 
-export class Location extends BaseModel<Location> {
+export class Location {
   private static instance: Location
 
-  public name!: string
+  public googlePlaceID!: string
+  public neighborhood!: string
+  public locality!: string
+  public city!: string
 
-  constructor(location?: Location) {
-    super(location ? location.id : null)
+  constructor(location?: ILocation) {
     if (!location) return
-    this.name = location.name
+    this.googlePlaceID = location.googlePlaceID
+    this.neighborhood = location.neighborhood
+    this.locality = location.locality
+    this.city = location.city
   }
 }

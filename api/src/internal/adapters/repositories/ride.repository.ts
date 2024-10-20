@@ -1,53 +1,84 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
 import { IPost, IRide, IRideType } from '../../domain/types'
-import { Ride } from '../../domain/ride'
+import { format } from 'date-fns'
+import { IPlaceDetails } from '../../../shared/utils/googleMaps'
+import { UUID } from 'crypto'
 
+interface IFindRidesParams {
+  fromLocation: IPlaceDetails
+  toLocation: IPlaceDetails
+  startDate: string
+}
+
+interface IRideEntity {
+  fromLocationID: string
+  toLocationID: string
+  actualSeats: number
+  seatsFilled: number
+  startTime: Date
+  duration: number
+}
 export class RideRepository extends BaseRepository<IPost<IRide>> {
   constructor(pool: Pool) {
     super(pool, 'rides')
   }
 
-  private fromRow(row: QueryResultRow): Ride {
-    return new Ride({
+  private fromRow(row: QueryResultRow): IPost<IRide> {
+    return {
       id: row.id,
-      userId: row.user_id,
+      user: {
+        id: row.user_id,
+        name: row.user_name,
+      },
       type: IRideType.RIDE,
       about: row.details,
       details: {
-        startLocationID: row.start_location_id,
-        endLocationID: row.end_location_id,
+        fromLocation: {
+          googlePlaceID: row.start_placeID,
+          neighborhood: row.start_neighborhood,
+          locality: row.start_locality,
+          city: row.start_city,
+        },
+        toLocation: {
+          googlePlaceID: row.end_placeID,
+          neighborhood: row.end_neighborhood,
+          locality: row.end_locality,
+          city: row.end_city,
+        },
         actualSeats: row.actual_seats,
         seatsFilled: row.seats_filled,
         startTime: row.start_time,
-        duration: row.end_time,
+        duration: row.duration,
       },
-    })
+    }
   }
 
-  private toRow(ride: Partial<IPost<Partial<IRide>>>): Partial<QueryResultRow> {
+  private toRow(
+    ride: Partial<IPost<Partial<IRideEntity>>>,
+  ): Partial<QueryResultRow> {
     const row: Partial<QueryResultRow> = {}
 
     if (ride.id !== undefined) {
       row.id = ride.id
     }
-    if (ride.userId !== undefined) {
-      row.user_id = ride.userId
+    if (ride.user?.id !== undefined) {
+      row.user_id = ride.user.id
     }
     if (ride.about !== undefined) {
       row.about = ride.about
     }
-    if (ride.details?.startLocationID !== undefined) {
-      row.start_location_id = ride.details.startLocationID
+    if (ride.details?.fromLocationID !== undefined) {
+      row.from_location_id = ride.details.fromLocationID
     }
-    if (ride.details?.endLocationID !== undefined) {
-      row.end_location_id = ride.details.endLocationID
+    if (ride.details?.toLocationID !== undefined) {
+      row.to_location_id = ride.details.toLocationID
     }
     if (ride.details?.actualSeats !== undefined) {
       row.actual_seats = ride.details.actualSeats
     }
     if (ride.details?.seatsFilled !== undefined) {
-      row.total_seats_filled = ride.details.seatsFilled
+      row.seats_filled = ride.details.seatsFilled
     }
     if (ride.details?.startTime !== undefined) {
       row.start_time = ride.details.startTime
@@ -60,19 +91,122 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
   }
 
   public async create(
-    item: Omit<IPost<Omit<IRide, 'seatsFilled'>>, 'id' | 'type'>,
-  ): Promise<Ride | null> {
+    item: Omit<IPost<Omit<IRideEntity, 'seatsFilled'>>, 'id' | 'type'>,
+  ): Promise<IPost<IRide> | null> {
     const row = await super.create(this.toRow(item))
     return row ? this.fromRow(row) : null
   }
 
-  public async findByID(id: string): Promise<Ride | null> {
-    const row = await super.findByID(id)
+  public async findByID(id: string): Promise<IPost<IRide> | null> {
+    const query = `
+      SELECT r.*, 
+            u.id AS user_id, 
+            u.name AS user_name, 
+            u.pic AS user_pic,
+            startLoc.google_place_id AS start_place_id, 
+            startLoc.neighborhood AS start_neighborhood, 
+            startLoc.locality AS start_locality, 
+            startLoc.city AS start_city, 
+            startLoc.state AS start_state, 
+            startLoc.country AS start_country, 
+            startLoc.description AS start_description,
+            endLoc.google_place_id AS end_place_id,
+            endLoc.neighborhood AS end_neighborhood, 
+            endLoc.locality AS end_locality, 
+            endLoc.city AS end_city, 
+            endLoc.state AS end_state, 
+            endLoc.country AS end_country, 
+            endLoc.description AS end_description
+      FROM rides r
+      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
+      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
+      JOIN users u ON r.user_id = u.id
+      WHERE r.id = $1
+    `
+
+    const { rows } = await this.pool.query(query, [id])
+    const row = rows[0]
+
     return row ? this.fromRow(row) : null
   }
 
-  public async findRidesByUserID(userID: string): Promise<Ride[] | null> {
-    const rows = await super.findAllByColumn('user_id', userID)
-    return !!rows ? rows.map((r) => this.fromRow(r)) : null
+  public async findRidesByUserID(userID: UUID): Promise<IPost<IRide>[] | null> {
+    let query = `
+      SELECT r.*, 
+            u.id AS user_id, 
+            u.name AS user_name, 
+            u.pic AS user_pic,
+            startLoc.google_place_id AS start_place_id, 
+            startLoc.neighborhood AS start_neighborhood, 
+            startLoc.locality AS start_locality, 
+            startLoc.city AS start_city, 
+            endLoc.google_place_id AS end_place_id, 
+            endLoc.neighborhood AS end_neighborhood, 
+            endLoc.locality AS end_locality, 
+            endLoc.city AS end_city
+      FROM rides r
+      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
+      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
+      JOIN users u ON r.user_id = u.id
+      WHERE u.id = $1
+    `
+    const { rows } = await this.pool.query(query, [userID])
+
+    return !!rows ? rows.map(this.fromRow) : null
+  }
+
+  public async findRides({
+    fromLocation,
+    toLocation,
+    startDate,
+  }: IFindRidesParams): Promise<IPost<IRide>[]> {
+    const params: any[] = [
+      fromLocation.neighborhood,
+      fromLocation.locality,
+      fromLocation.city,
+      toLocation.neighborhood,
+      toLocation.locality,
+      toLocation.city,
+    ]
+
+    let query = `
+      SELECT r.*, 
+             u.id AS user_id, 
+             u.name AS user_name, 
+             u.pic AS user_pic,
+             startLoc.google_place_id AS start_place_id, 
+             startLoc.neighborhood AS start_neighborhood, 
+             startLoc.locality AS start_locality, 
+             startLoc.city AS start_city, 
+             endLoc.google_place_id AS end_place_id, 
+             endLoc.neighborhood AS end_neighborhood, 
+             endLoc.locality AS end_locality, 
+             endLoc.city AS end_city
+      FROM rides r
+      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
+      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
+      JOIN users u ON r.user_id = u.id
+      WHERE (
+        (startLoc.neighborhood = $1 AND endLoc.neighborhood = $4)
+        OR (startLoc.neighborhood = $1 AND endLoc.locality = $5)
+        OR (startLoc.locality = $2 AND endLoc.locality = $5)
+        OR (startLoc.neighborhood = $1 AND endLoc.city = $6)
+        OR (startLoc.locality = $2 AND endLoc.city = $6)
+        OR (startLoc.city = $3 AND endLoc.city = $6)
+      )
+    `
+
+    if (startDate) {
+      // Assuming startDate is in ISO format, extract the date part and set time range for the entire day
+      const datePart = startDate.split('T')[0] // Extracts '2024-10-09'
+      const startDateTime = `${datePart}T00:00:00.000Z` // Start of the day
+      const endDateTime = `${datePart}T23:59:59.999Z` // End of the day
+
+      query += ` AND r.start_time >= $7 AND r.start_time <= $8`
+      params.push(startDateTime, endDateTime)
+    }
+
+    const { rows } = await this.pool.query(query, params)
+    return rows.map(this.fromRow)
   }
 }

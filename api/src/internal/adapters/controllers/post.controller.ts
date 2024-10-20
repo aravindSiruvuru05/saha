@@ -3,17 +3,9 @@ import catchAsync from '../../../shared/utils/catchAsync'
 import AppError from '../../../shared/utils/appError'
 import { STATUS_CODES } from '../../../shared/utils'
 import { parseISO } from 'date-fns'
-import { IPost, IRide, IRideType } from '../../domain/types'
-import { Time } from '@googlemaps/google-maps-services-js'
+import { ICreateRideRequest, IGetRidesReq } from './types'
+import { getPlaceDetails } from '../../serviceHandlers/google.service'
 
-export interface ICreateRideRequest {
-  about: string
-  start_location: string
-  end_location: string
-  actual_seats: number
-  start_time: string
-  duration: number
-}
 // Create a new ride
 export const createPost = catchAsync(
   async (
@@ -23,10 +15,10 @@ export const createPost = catchAsync(
   ) => {
     const {
       about,
-      start_location: sLocation,
-      end_location: eLocation,
-      actual_seats: actualSeats,
-      start_time: startTime,
+      fromLocation,
+      toLocation,
+      actualSeats,
+      startTime,
       duration,
     } = req.body
 
@@ -40,10 +32,16 @@ export const createPost = catchAsync(
     }
 
     const startLocation = await req.repositories.location.getOrCreate({
-      name: sLocation,
+      googlePlaceID: fromLocation.googlePlaceID,
+      neighborhood: fromLocation.neighborhood,
+      locality: fromLocation.locality,
+      city: fromLocation.city,
     })
     const endLocation = await req.repositories.location.getOrCreate({
-      name: eLocation,
+      googlePlaceID: toLocation.googlePlaceID,
+      neighborhood: toLocation.neighborhood,
+      locality: toLocation.locality,
+      city: toLocation.city,
     })
 
     if (!startLocation || !endLocation) {
@@ -53,11 +51,11 @@ export const createPost = catchAsync(
     }
 
     const newRide = await req.repositories.ride.create({
-      userId: req.currUser.id,
+      user: { id: req.currUser.id },
       about: about,
       details: {
-        startLocationID: startLocation.id,
-        endLocationID: endLocation.id,
+        fromLocationID: startLocation.googlePlaceID,
+        toLocationID: endLocation.googlePlaceID,
         actualSeats,
         startTime: parseISO(startTime),
         duration: duration,
@@ -72,6 +70,74 @@ export const createPost = catchAsync(
     res.status(STATUS_CODES.CREATED).json({
       data: {
         ride: newRide,
+      },
+    })
+  },
+)
+
+export const getUserRides = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.currUser.id
+
+    const userRides = await req.repositories.ride.findRidesByUserID(userId)
+
+    if (!userRides || userRides.length === 0) {
+      return next(
+        new AppError('No rides found for the user', STATUS_CODES.BAD_REQUEST),
+      )
+    }
+
+    // Return the fetched rides in the response
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        rides: userRides,
+      },
+    })
+  },
+)
+
+export const findRides = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const { fromPlaceID, toPlaceID, startDate } =
+      req.query as unknown as IGetRidesReq
+
+    if (!fromPlaceID || !toPlaceID || !startDate) {
+      return next(
+        new AppError(
+          'Start location and end location are required',
+          STATUS_CODES.BAD_REQUEST,
+        ),
+      )
+    }
+    const fromLocation = await getPlaceDetails(fromPlaceID)
+    const toLocation = await getPlaceDetails(toPlaceID)
+    // Parse start time if provided
+    // let parsedStartTime
+    // if (startDate) {
+    //   parsedStartTime = parseISO(startDate)
+    // }
+
+    // Find rides between the locations
+    const rides = await req.repositories.ride.findRides({
+      fromLocation,
+      toLocation,
+      startDate,
+    })
+
+    if (!rides || rides.length === 0) {
+      return res.status(STATUS_CODES.OK).json({
+        data: {
+          message: 'No rides found between these locations.',
+          rides: [],
+        },
+      })
+    }
+
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        fromLocation: fromLocation.description,
+        toLocation: toLocation.description,
+        rides,
       },
     })
   },

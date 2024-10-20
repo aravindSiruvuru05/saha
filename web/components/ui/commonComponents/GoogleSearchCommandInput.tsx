@@ -71,10 +71,10 @@ export const GoogleSearchCommandInput = ({
         alert('Unable to retrieve place details. Please try again.');
       }
     } else if (suggestion === 'current_location') {
+      setIsFetchingLocation(true);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async position => {
-            setIsFetchingLocation(true);
             const { latitude, longitude } = position.coords;
             try {
               const placeDetails = await getCurrentLocationDetails(

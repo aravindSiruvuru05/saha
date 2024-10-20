@@ -1,36 +1,47 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
 import { Location } from '../../domain/location'
+import { ILocation } from '../controllers/types'
 
-export class LocationRepository extends BaseRepository<Location> {
+export class LocationRepository extends BaseRepository<ILocation> {
   constructor(pool: Pool) {
     super(pool, 'locations')
   }
 
   private fromRow(row: QueryResultRow): Location {
     return new Location({
-      id: row.id,
-      name: row.name,
+      googlePlaceID: row.google_place_id,
+      neighborhood: row.neighborhood,
+      locality: row.locality,
+      city: row.city,
     })
   }
 
-  private toRow(location: Partial<Location>): Partial<QueryResultRow> {
+  private toRow(location: Partial<ILocation>): Partial<QueryResultRow> {
     const row: Partial<QueryResultRow> = {}
 
-    if (location.id !== undefined) {
-      row.id = location.id
+    if (location.googlePlaceID !== undefined) {
+      row.google_place_id = location.googlePlaceID
     }
-    if (location.name !== undefined) {
-      row.name = location.name
+    if (location.neighborhood !== undefined) {
+      row.neighborhood = location.neighborhood
     }
-    console.log(row, '===')
+    if (location.city !== undefined) {
+      row.city = location.city
+    }
+    if (location.locality !== undefined) {
+      row.locality = location.locality
+    }
     return row
   }
 
   public async getOrCreate(
-    item: Omit<Location, 'id'>,
+    item: Omit<ILocation, 'id'>,
   ): Promise<Location | null> {
-    const existingLocations = await super.findAllByColumn('name', item.name)
+    const existingLocations = await super.findAllByColumn(
+      'google_place_id',
+      item.googlePlaceID,
+    )
     if (existingLocations && existingLocations.length > 0) {
       return this.fromRow(existingLocations[0])
     }
@@ -45,7 +56,7 @@ export class LocationRepository extends BaseRepository<Location> {
 
   public async update(
     id: string,
-    item: Partial<Location>,
+    item: Partial<ILocation>,
   ): Promise<Location | null> {
     const row = await super.update(id, this.toRow(item))
     return row ? this.fromRow(row) : null

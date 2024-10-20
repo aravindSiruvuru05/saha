@@ -14,7 +14,7 @@ const getUserByEmail = async (
 
 const createUser = async (
   req: Request,
-  user: Omit<IUser, 'id'>,
+  user: Omit<IUser, 'id' | 'pic'>,
 ): Promise<User | null> => {
   if (!user.password) return null
 

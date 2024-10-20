@@ -1,4 +1,3 @@
-import { Clock } from 'lucide-react';
 import {
   Select,
   SelectContent,

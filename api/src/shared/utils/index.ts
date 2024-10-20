@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { IPlaceDetails } from './googleMaps'
 
 const STATUS_CODES = {
   OK: 200,

@@ -27,6 +27,9 @@ exports.up = (pgm) => {
       notNull: true,
       unique: true, // Ensure unique email addresses
     },
+    pic: {
+      type: 'varchar(100)', // Max length for name
+    },
     role: {
       type: 'user_role',
       notNull: true,

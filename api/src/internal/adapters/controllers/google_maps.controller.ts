@@ -5,6 +5,10 @@ import { STATUS_CODES } from '../../../shared/utils'
 import googleMapsService from '../../../shared/utils/googleMaps'
 import { TravelMode } from '@googlemaps/google-maps-services-js'
 import { ParsedUrlQuery } from 'querystring'
+import {
+  getPlaceDetails,
+  getdistanceData,
+} from '../../serviceHandlers/google.service'
 
 // interface IGoogleMapsDistanceMatrixRequestParams {
 //   originPlaceId: string
@@ -19,12 +23,8 @@ export const distanceMatrix = catchAsync(
       origins: string
       destinations: string
     }
-    const distanceData = await googleMapsService
-      .getInstance()
-      .getDistanceMatrix({
-        origins,
-        destinations,
-      })
+
+    const distanceData = await getdistanceData({ origins, destinations })
 
     res.status(STATUS_CODES.OK).json({
       data: distanceData,
@@ -35,10 +35,8 @@ export const distanceMatrix = catchAsync(
 export const placeDetails = catchAsync(
   async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
     const { id: placeID } = req.query as { id: string }
-    const placeDetails = await googleMapsService
-      .getInstance()
-      .getPlaceDetails(placeID)
 
+    const placeDetails = await getPlaceDetails(placeID)
     res.status(STATUS_CODES.OK).json({
       data: placeDetails,
     })

@@ -1,3 +1,4 @@
+import { IPlaceDetails } from '@/utils/google_places';
 import { UUID } from 'crypto';
 
 export interface IDistanceResponse {
@@ -28,6 +29,7 @@ export enum IUserRole {
 
 export interface IUserResult extends IWithID {
   name: string;
+  pic: string;
   email: string;
   role: IUserRole;
 }
@@ -53,35 +55,37 @@ export enum IRideType {
   HOUSE_ACCOMDATION = 'HOUSE_ACCOMDATION',
 }
 
-export interface ILocation extends IWithID {
-  name: string;
+export interface IFindRidesRes {
+  fromLocation: string;
+  toLocation: string;
+  rides: IPost<IRide>[];
 }
 export interface IPost<T = unknown> extends IWithID {
-  userId: string;
-  details: T;
-  about: string;
-  type: IRideType;
-}
-export interface IPost<T = unknown> extends IWithID {
-  userId: string;
+  user: IUserResult;
   details: T;
   about: string;
   type: IRideType;
 }
 
 export interface IRide {
-  startLocationId: string;
-  endLocationId: string;
+  fromLocation: IPlaceDetails;
+  toLocation: IPlaceDetails;
   actualSeats: number;
   seatsFilled: number;
-  startTime: Date;
-  endTime?: Date;
+  startTime: string;
+  endTime?: string;
 }
 
 export interface ICreateRideRequest {
   about: string;
-  start_location: string;
-  end_location: string;
-  actual_seats: number;
-  start_time: string;
+  fromLocation: IPlaceDetails;
+  toLocation: IPlaceDetails;
+  actualSeats: number;
+  startTime: string;
+}
+
+export interface IFindRidesReqQuery {
+  fromPlaceID: string;
+  toPlaceID: string;
+  startDate: string;
 }
