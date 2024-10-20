@@ -102,11 +102,19 @@ const RideCardsList: React.FC<RideCardsListProps> = ({
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <div className="font-medium">From</div>
-                  <div>{ride.details.fromLocation.neighborhood}</div>
+                  <div>
+                    {ride.details.fromLocation.neighborhood ||
+                      ride.details.fromLocation.locality}
+                    , {ride.details.fromLocation.city}
+                  </div>
                 </div>
                 <div>
                   <div className="font-medium">To</div>
-                  <div>{ride.details.toLocation.neighborhood}</div>
+                  <div>
+                    {ride.details.toLocation.neighborhood ||
+                      ride.details.toLocation.locality}
+                    , {ride.details.toLocation.city}
+                  </div>
                 </div>
               </div>
 

@@ -17,11 +17,16 @@ export interface ILocation {
   city: string
 }
 
+interface IStartTime {
+  dateTimeValue: string
+  userTZ: string
+}
+
 export interface ICreateRideRequest {
   about: string
   fromLocation: ILocation
   toLocation: ILocation
   actualSeats: number
-  startTime: string
+  startTime: IStartTime
   duration: number
 }

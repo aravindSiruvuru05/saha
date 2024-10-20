@@ -72,47 +72,53 @@ export const PublishRideForm = () => {
   };
 
   const combineDateAndTime = (
-    rideDate?: Date,
-    startTime?: string,
-  ): string | null => {
-    if (!rideDate || !startTime) return null;
+    rideDate: Date,
+    startTime: string,
+  ): { dateTimeValue: string; userTZ: string } => {
     // Create a new Date object from the rideDate
     const date = new Date(rideDate);
+    console.log(rideDate, startTime, '=====', date);
 
     // Extract hours and minutes from the startTime (assumes format "HH:mm")
     const [hours, minutes] = startTime.split(':').map(Number);
 
     // Set the hours and minutes on the date object
-    date.setHours(hours, minutes, 0, 0); // Set seconds and milliseconds to zero
+    date.setHours(hours, minutes, 0, 0); // Reset seconds and milliseconds
+    console.log(date, '=====');
+    // Get user's timezone
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Convert to ISO string
     const isoString = date.toISOString();
+    console.log(isoString, '----');
 
-    return isoString;
+    return { dateTimeValue: isoString, userTZ: userTimezone };
   };
 
   const handleNext = async () => {
-    console.log(
-      combineDateAndTime(rideDate, startTime),
-      // new Date(`${rideDate}T${startTime}:00Z`).toISOString(),
-    );
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else if (currentStep === steps.length) {
-      if (!fromLocation || !toLocation) {
+      console.log(fromLocation, toLocation, '====');
+      if (
+        Object.keys(fromLocation || {}).length == 0 ||
+        Object.keys(toLocation || {}).length == 0
+      ) {
         console.error('error in from and to lation');
         return;
       }
+      if (!fromLocation || !toLocation || !rideDate) return;
       try {
         // setDisableSubmit(true);
         const res = await createPost({
-          fromLocation,
-          toLocation,
+          fromLocation: { ...fromLocation },
+          toLocation: { ...toLocation },
           about: '',
           actualSeats: parseInt(availableSeats, 10),
-          startTime: combineDateAndTime(rideDate, startTime) || '',
+          startTime: combineDateAndTime(rideDate, startTime),
         }).unwrap();
-        router.push('/', 'root', 'replace');
+        alert('Your ride is created successfully!!');
+        router.push('/rides-home?backhome=true', 'root', 'pop');
       } catch (e) {
         console.error(e);
       }

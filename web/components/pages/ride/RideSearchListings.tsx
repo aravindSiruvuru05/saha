@@ -11,7 +11,7 @@ export const RideSearchListings = () => {
   const query = new URLSearchParams(location.search);
   const fromID = query.get('from');
   const toID = query.get('to');
-  const rideDate = query.get('date');
+  const rideDate = decodeURIComponent(query.get('date') || '');
 
   const router = useIonRouter();
   const {
