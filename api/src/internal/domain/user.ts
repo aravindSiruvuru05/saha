@@ -40,7 +40,6 @@ export class User extends BaseModel<IUser> {
     candidatePassword: string,
     userPassword: string,
   ) {
-    console.log(candidatePassword, userPassword)
     return await bcrypt.compare(candidatePassword, userPassword)
   }
 }

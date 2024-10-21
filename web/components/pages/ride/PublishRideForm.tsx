@@ -22,6 +22,7 @@ import { IPlaceDetails } from '@/utils/google_places';
 import { useCreatePostMutation } from '@/store/apiSlice';
 import { start } from 'repl';
 import { useIonRouter } from '@ionic/react';
+import { useActiveTab } from '../ActiveTabContext';
 
 const locations = [
   { value: 'newyork' },
@@ -54,6 +55,7 @@ export const PublishRideForm = () => {
   const [createPost, { isLoading: isCreating, error }] =
     useCreatePostMutation();
   const router = useIonRouter();
+  const { setActiveTab } = useActiveTab();
   const [disableSubmit, setDisableSubmit] = useState(false);
   // const isSmallScreen = useMediaQuery({ query: '(min-width: 640px)' });
   // const isMediumScreen = useMediaQuery({ query: '(min-width: 768px)' });
@@ -77,29 +79,21 @@ export const PublishRideForm = () => {
   ): { dateTimeValue: string; userTZ: string } => {
     // Create a new Date object from the rideDate
     const date = new Date(rideDate);
-    console.log(rideDate, startTime, '=====', date);
 
     // Extract hours and minutes from the startTime (assumes format "HH:mm")
     const [hours, minutes] = startTime.split(':').map(Number);
 
     // Set the hours and minutes on the date object
     date.setHours(hours, minutes, 0, 0); // Reset seconds and milliseconds
-    console.log(date, '=====');
-    // Get user's timezone
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Convert to ISO string
     const isoString = date.toISOString();
-    console.log(isoString, '----');
-
-    return { dateTimeValue: isoString, userTZ: userTimezone };
+    return { dateTimeValue: isoString, userTZ: '' };
   };
 
   const handleNext = async () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else if (currentStep === steps.length) {
-      console.log(fromLocation, toLocation, '====');
       if (
         Object.keys(fromLocation || {}).length == 0 ||
         Object.keys(toLocation || {}).length == 0
@@ -118,7 +112,7 @@ export const PublishRideForm = () => {
           startTime: combineDateAndTime(rideDate, startTime),
         }).unwrap();
         alert('Your ride is created successfully!!');
-        router.push('/rides-home?backhome=true', 'root', 'pop');
+        setActiveTab('my-rides');
       } catch (e) {
         console.error(e);
       }

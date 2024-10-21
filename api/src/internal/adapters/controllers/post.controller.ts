@@ -21,7 +21,6 @@ export const createPost = catchAsync(
       startTime,
       duration,
     } = req.body
-
     if (actualSeats < 1) {
       return next(
         new AppError(
@@ -49,14 +48,7 @@ export const createPost = catchAsync(
         new AppError('error creating locations', STATUS_CODES.BAD_REQUEST),
       )
     }
-    // const localDate = new Date(startTime.dateTimeValue)
-    // console.log(localDate, 'local====')
-    // Convert to UTC using the user's timezone
-    // const startUtc = toZonedTime(localDate, startTime.userTZ, {
-    //   timeZone: 'UTC',
-    // })
-    // console.log(startUtc, 'startUtc====')
-    console.log(startTime.dateTimeValue, '-----')
+
     const newRide = await req.repositories.ride.create({
       user: { id: req.currUser.id },
       about: about,
