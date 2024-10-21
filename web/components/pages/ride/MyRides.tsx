@@ -10,7 +10,6 @@ export const MyRides = () => {
     error,
     isLoading: isFetchingRides,
   } = useGetMyRidesQuery({});
-  console.log(ridePosts);
 
   if (isFetchingRides) {
     return <div>Fetching your rides...</div>;
@@ -20,7 +19,7 @@ export const MyRides = () => {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-lg h-screen">
       <h2 className="text-xl font-semibold mb-4 pl-4">My Rides</h2>
       <RideCardsList rideListings={ridePosts} />
     </div>

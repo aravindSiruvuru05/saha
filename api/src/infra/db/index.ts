@@ -2,7 +2,6 @@ import { Pool } from 'pg'
 import migrate from 'node-pg-migrate'
 import path from 'path'
 
-console.log(process.env.DB_HOST, process.env.DB_NAME, process.env.NODE_ENV)
 const DB_CONFIG = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
