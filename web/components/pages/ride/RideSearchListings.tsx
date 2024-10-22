@@ -49,7 +49,7 @@ export const RideSearchListings = () => {
     } else {
       router.push('/rides-home', 'root');
     }
-  }, []);
+  }, [fromID, toID, startOfLocalDayISO, endOfLocalDayISO, refetch]);
 
   //TODO: get the distance and time between the from and to locaitons from BE with distance matrix
 
