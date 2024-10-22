@@ -4,11 +4,11 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/ui/commonComponents/StarRating';
 import { UserCircle2 } from 'lucide-react';
-import { getInitials } from '@/utils/common';
 import { IFindRidesRes } from '@/store/types';
 import { format } from 'date-fns';
 import { isBefore } from 'date-fns';
 import { NoRidesFound } from './NoRidesFound';
+import { getFullName } from '@/utils/common';
 
 interface Ride {
   id: string;
@@ -83,18 +83,18 @@ const RideCardsList: React.FC<RideCardsListProps> = ({
                   {ride.user.pic ? (
                     <Image
                       src={ride.user.pic}
-                      alt={ride.user.name}
+                      alt={ride.user.firstName}
                       width={40}
                       height={40}
                       className="rounded-full"
                     />
                   ) : (
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-white font-bold">
-                      {getInitials(ride.user.name)}
+                      {ride.user?.firstName[0] + ride.user?.lastName[0]}
                     </div>
                   )}
                   <div className="flex-grow">
-                    <div className="font-medium">{ride.user.name}</div>
+                    <div className="font-medium">{getFullName(ride.user)}</div>
                     <StarRating rating={4} />
                   </div>
                 </div>

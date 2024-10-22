@@ -18,7 +18,15 @@ exports.up = (pgm) => {
       primaryKey: true, // Set as primary key
       default: pgm.func('gen_random_uuid()'), // Generates a random UUID
     },
-    name: {
+    first_name: {
+      type: 'varchar(100)', // Max length for name
+      notNull: true,
+    },
+    last_name: {
+      type: 'varchar(100)', // Max length for name
+      notNull: true,
+    },
+    phone_number: {
       type: 'varchar(100)', // Max length for name
       notNull: true,
     },

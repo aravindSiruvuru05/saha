@@ -9,7 +9,7 @@ export const MyRides = () => {
     data: ridePosts,
     error,
     isLoading: isFetchingRides,
-  } = useGetMyRidesQuery({});
+  } = useGetMyRidesQuery({}, { refetchOnFocus: true });
 
   if (isFetchingRides) {
     return <div>Fetching your rides...</div>;

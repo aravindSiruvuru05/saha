@@ -58,6 +58,7 @@ export const GoogleSearchCommandInput = ({
     suggestion: google.maps.places.AutocompletePrediction | string,
   ) => {
     if (typeof suggestion !== 'string') {
+      console.log('=====', suggestion);
       // If a suggestion is selected, fetch additional details using reverse geocoding
       try {
         const placeDetails = await getPlaceDetailsByPlaceID(

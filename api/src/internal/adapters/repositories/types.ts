@@ -6,9 +6,12 @@ export enum IUserRoleEntity {
 }
 
 export interface IUserEntity extends IWithId {
-  name: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
   email: string
   photo?: string
+  pic?: string
   role: IUserRoleEntity
   password: string
   passwordChangedAt?: string

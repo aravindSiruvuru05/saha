@@ -20,7 +20,9 @@ const createUser = async (
 
   const hashedPassword = await hashPassword(user.password)
   const newUser = await req.repositories.user.create({
-    name: user.name,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
     email: user.email,
     role: mapUserRoleToEntity(user.role),
     password: hashedPassword,

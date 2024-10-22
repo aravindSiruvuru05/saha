@@ -1,13 +1,14 @@
 import { IUser } from '../../domain/types'
 
 export interface IUserRequest extends IUser {
-  confirm_password: string
+  confirmPassword: string
 }
 
 export interface IGetRidesReq {
   fromPlaceID: string
   toPlaceID: string
   startDate?: string
+  endDate: string
 }
 
 export interface ILocation {
