@@ -75,7 +75,7 @@ export const signin = catchAsync(
     const user = await getUserByEmail(req, email)
 
     if (!user || !(await user.isCorrectPassword(password, user.password!))) {
-      return next(new AppError('Incorrect email or password', 401))
+      return next(new AppError('Incorrect email or password ', 401))
     }
 
     const token = signToken(user.id)
