@@ -33,7 +33,7 @@ export interface IUserResult extends IWithID {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  pic: string;
+  pic?: string;
   email: string;
   role: IUserRole;
 }

@@ -8,18 +8,67 @@ import {
 
 import { IPlaceDetails } from '@/utils/google_places';
 import {
-  IApiResponse,
   ICreateRideRequest,
-  IDistanceResponse,
   IFindRidesReqQuery,
   IFindRidesRes,
   IPost,
   IRide,
-  ISigninPayload,
-  ISigninResult,
-  ISignupPayload,
-  ISignupResult,
 } from './types';
+import { UUID } from 'crypto';
+
+export interface IDistanceResponse {
+  distance: string;
+  duration: string;
+}
+
+export interface IWithID {
+  id: UUID;
+}
+export interface ISigninPayload {
+  email: string;
+  password: string;
+}
+
+export interface ISignupPayload {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  pic?: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  photo?: string;
+}
+
+export enum IUserRole {
+  ADMIN,
+  MEMBER,
+}
+
+export interface IUserResult extends IWithID {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  pic?: string;
+  email: string;
+  role: IUserRole;
+}
+export interface ISigninResult {
+  token: string;
+  user: IUserResult;
+}
+
+export interface IApiResponse<T> {
+  data: T;
+}
+export interface ISignupResult {
+  token: string;
+}
+
+export interface IDistanceResponse {
+  distance: string;
+  duration: string;
+}
 
 export const prepareAuthorizationHeader = (): Record<string, string> => {
   const token = localStorage.getItem('AccessToken');

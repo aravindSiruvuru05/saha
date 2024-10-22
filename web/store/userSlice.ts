@@ -3,7 +3,9 @@ import { ISigninResult, IUserRole } from './types';
 
 // Define the initial state for the user
 interface UserState {
-  name: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   email: string;
   token: string;
   role: IUserRole | null;
@@ -11,7 +13,9 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  name: '',
+  firstName: '',
+  lastName: '',
+  phoneNumber: '',
   email: '',
   token: '',
   role: null,
@@ -26,14 +30,18 @@ export const userSlice = createSlice({
     // Action to store user data
     setUser: (state, action: PayloadAction<ISigninResult>) => {
       const { token, user } = action.payload;
-      state.name = user.name;
+      state.firstName = user.firstName;
+      state.lastName = user.lastName;
+      state.phoneNumber = user.phoneNumber;
       state.email = user.email;
       state.token = token;
       state.isLoggedIn = true;
     },
     // Action to clear user data (for logout)
     clearUser: state => {
-      state.name = '';
+      state.firstName = '';
+      state.lastName = '';
+      state.phoneNumber = '';
       state.email = '';
       state.token = '';
       state.isLoggedIn = false;
