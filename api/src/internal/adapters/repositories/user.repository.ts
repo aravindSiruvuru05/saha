@@ -20,10 +20,45 @@ export class UserRepository extends BaseRepository<IUserEntity> {
     super(pool, 'users')
   }
 
+  private toRow(user: Partial<IUserEntity>): Partial<QueryResultRow> {
+    const row: Partial<QueryResultRow> = {}
+
+    if (user.id !== undefined) {
+      row.id = user.id
+    }
+    if (user.firstName !== undefined) {
+      row.first_name = user.firstName
+    }
+    if (user.lastName !== undefined) {
+      row.last_name = user.lastName
+    }
+    if (user.phoneNumber !== undefined) {
+      row.phone_number = user.phoneNumber
+    }
+    if (user.email !== undefined) {
+      row.email = user.email
+    }
+    if (user.password !== undefined) {
+      row.password = user.password
+    }
+    if (user.pic !== undefined) {
+      row.pic = user.pic
+    }
+    if (user.role !== undefined) {
+      row.role = user.role
+    }
+    if (user.passwordChangedAt !== undefined) {
+      row.password_changed_at = user.passwordChangedAt
+    }
+    return row
+  }
+
   private fromRow(row: QueryResultRow): User {
     return new User({
       id: row.id,
-      name: row.name,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      phoneNumber: row.phone_number,
       email: row.email,
       photo: row.photo,
       pic: row.pic,
@@ -36,7 +71,7 @@ export class UserRepository extends BaseRepository<IUserEntity> {
   }
 
   public async create(item: Omit<IUserEntity, 'id'>): Promise<User | null> {
-    const row = await super.create(item)
+    const row = await super.create(this.toRow(item))
     return row ? this.fromRow(row) : null
   }
 

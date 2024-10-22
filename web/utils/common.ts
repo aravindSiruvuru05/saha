@@ -1,13 +1,14 @@
 import { isValid } from 'date-fns';
 
-export const getInitials = (name: string) => {
-  const initials = name
-    .split(' ')
-    .map(word => word[0].toUpperCase())
-    .join('');
-  return initials;
+export const getFullName = ({
+  firstName,
+  lastName,
+}: {
+  firstName: string;
+  lastName: string;
+}) => {
+  return firstName + ' ' + lastName;
 };
-
 export const getStartAndEndOfDay = (
   isoString: string,
 ): {
@@ -18,7 +19,7 @@ export const getStartAndEndOfDay = (
     startOfLocalDayISO: null,
     endOfLocalDayISO: null,
   };
-  if (isValid(isoString)) {
+  if (!isoString || isValid(isoString)) {
     return result;
   }
   // Create a Date object from the ISO string
@@ -36,7 +37,6 @@ export const getStartAndEndOfDay = (
 
   // Get end of the day
   const endOfLocalDay = new Date(localDate.setHours(23, 59, 59, 999));
-
   // Convert to ISO strings
   const startOfLocalDayISO = startOfLocalDay.toISOString();
   const endOfLocalDayISO = endOfLocalDay.toISOString();

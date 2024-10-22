@@ -17,9 +17,10 @@ export interface ISigninPayload {
 export interface ISignupPayload {
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   email: string;
   password: string;
-  confirm_password: string;
+  confirmPassword: string;
   photo?: string;
 }
 
@@ -29,7 +30,9 @@ export enum IUserRole {
 }
 
 export interface IUserResult extends IWithID {
-  name: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   pic: string;
   email: string;
   role: IUserRole;

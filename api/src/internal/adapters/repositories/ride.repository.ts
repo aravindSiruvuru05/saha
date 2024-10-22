@@ -30,7 +30,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       id: row.id,
       user: {
         id: row.user_id,
-        name: row.user_name,
+        firstName: row.first_name,
+        lastName: row.last_name,
       },
       type: IRideType.RIDE,
       about: row.details,
@@ -102,7 +103,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     const query = `
       SELECT r.*, 
             u.id AS user_id, 
-            u.name AS user_name, 
+            u.first_name AS first_name, 
+            u.last_name AS last_name,
             u.pic AS user_pic,
             startLoc.google_place_id AS start_place_id, 
             startLoc.neighborhood AS start_neighborhood, 
@@ -135,7 +137,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     let query = `
       SELECT r.*, 
             u.id AS user_id, 
-            u.name AS user_name, 
+            u.first_name AS first_name, 
+            u.last_name AS last_name,
             u.pic AS user_pic,
             startLoc.google_place_id AS start_place_id, 
             startLoc.neighborhood AS start_neighborhood, 
@@ -172,17 +175,18 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     ]
     let query = `
       SELECT r.*, 
-             u.id AS user_id, 
-             u.name AS user_name, 
-             u.pic AS user_pic,
-             startLoc.google_place_id AS start_place_id, 
-             startLoc.neighborhood AS start_neighborhood, 
-             startLoc.locality AS start_locality, 
-             startLoc.city AS start_city, 
-             endLoc.google_place_id AS end_place_id, 
-             endLoc.neighborhood AS end_neighborhood, 
-             endLoc.locality AS end_locality, 
-             endLoc.city AS end_city
+            u.id AS user_id, 
+            u.first_name AS first_name, 
+            u.last_name AS last_name,
+            u.pic AS user_pic,
+            startLoc.google_place_id AS start_place_id, 
+            startLoc.neighborhood AS start_neighborhood, 
+            startLoc.locality AS start_locality, 
+            startLoc.city AS start_city, 
+            endLoc.google_place_id AS end_place_id, 
+            endLoc.neighborhood AS end_neighborhood, 
+            endLoc.locality AS end_locality, 
+            endLoc.city AS end_city
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id

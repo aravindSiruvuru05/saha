@@ -12,7 +12,9 @@ export interface IWithId {
 }
 
 export interface IUser extends IWithId {
-  name: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
   email: string
   photo: string
   pic: string

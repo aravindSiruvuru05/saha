@@ -19,11 +19,13 @@ export const signup = catchAsync(
     next: NextFunction,
   ) => {
     const {
-      name,
+      firstName,
+      lastName,
+      phoneNumber,
       email,
       password,
       photo,
-      confirm_password: confirmPassword,
+      confirmPassword,
     } = req.body
 
     if (password !== confirmPassword) {
@@ -36,7 +38,9 @@ export const signup = catchAsync(
     }
 
     const newUser = await createUser(req, {
-      name,
+      firstName,
+      lastName,
+      phoneNumber,
       email,
       password,
       photo,

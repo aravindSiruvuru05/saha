@@ -5,7 +5,9 @@ import { IUser, IUserRole } from './types'
 export class User extends BaseModel<IUser> {
   private static instance: User
 
-  public name!: string
+  public firstName!: string
+  public lastName!: string
+  public phoneNumber!: string
   public email!: string
   public pic!: string
   public photo!: string | null
@@ -16,7 +18,9 @@ export class User extends BaseModel<IUser> {
   constructor(user?: IUser) {
     super(user ? user.id : null)
     if (!user) return
-    this.name = user.name
+    this.firstName = user.firstName
+    this.lastName = user.lastName
+    this.phoneNumber = user.phoneNumber
     this.email = user.email
     this.photo = user.photo
     this.pic = user.pic

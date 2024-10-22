@@ -16,7 +16,9 @@ import { AlertDialog } from '@/components/ui/commonComponents/AlertDialog';
 import { APP_LABELS } from '@/utils/labels';
 
 export const Signup = () => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -36,10 +38,12 @@ export const Signup = () => {
     }
     try {
       const res = await signup({
-        name,
+        firstName,
+        lastName,
+        phoneNumber,
         email,
         password,
-        confirm_password: confirmPassword,
+        confirmPassword,
       }).unwrap();
       setShowSuccessDialog(true);
     } catch (e: any) {
@@ -63,25 +67,37 @@ export const Signup = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="first-name">Name</Label>
+              <Label htmlFor="first-name">First Name</Label>
               <Input
                 id="first-name"
                 type="text"
-                placeholder={APP_LABELS.namePlaceholder}
+                placeholder={APP_LABELS.firstNamePlaceholder}
                 required
-                value={name}
-                onChange={e => setName(e.target.value)}
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Last Name</Label>
               <Input
-                id="name"
+                id="last-name"
                 type="text"
-                placeholder={APP_LABELS.namePlaceholder}
+                placeholder={APP_LABELS.lastNamePlaceholder}
                 required
-                value={name}
-                onChange={e => setName(e.target.value)}
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Phonenumber</Label>
+              <Input
+                id="phone-number"
+                type="text"
+                maxLength={10}
+                placeholder={APP_LABELS.phoneNumberPlaceholder}
+                required
+                value={phoneNumber}
+                onChange={e => setPhoneNumber(e.target.value)}
               />
             </div>
             <div className="space-y-2">
