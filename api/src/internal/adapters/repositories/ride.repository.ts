@@ -9,6 +9,7 @@ interface IFindRidesParams {
   fromLocation: IPlaceDetails
   toLocation: IPlaceDetails
   startDate: string
+  endDate: string
 }
 
 interface IRideEntity {
@@ -159,6 +160,7 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     fromLocation,
     toLocation,
     startDate,
+    endDate,
   }: IFindRidesParams): Promise<IPost<IRide>[]> {
     const params: any[] = [
       fromLocation.neighborhood,
@@ -194,12 +196,18 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         OR (startLoc.city = $3 AND endLoc.city = $6)
       )
     `
+    // Extract the date part from the startDate
+    const [datePart] = startDate?.split('T')
 
+    // If a startDate is provided, add conditions to the query
     if (startDate) {
-      query += ` AND r.start_time::date = $7`
-      params.push(startDate)
+      query += ` AND r.start_time >= $7 AND r.start_time < $8`
+      params.push(startDate, endDate)
     }
-    const a = await this.pool.query(query, params)
-    return a.rows.map(this.fromRow)
+
+    console.log(query, params, startDate, '=====')
+    const result = await this.pool.query(query, params)
+
+    return result.rows.map(this.fromRow)
   }
 }

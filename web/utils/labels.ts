@@ -4,7 +4,7 @@ export const APP_LABELS = {
   emailPlaceholder: 'Enter your email...',
   passwordPlaceholder: 'Enter your password...',
   confirmPasswordPlaceholder: 'Confirm your password...',
-  namePlaceholder: 'Enter your name...',
+  namePlaceholder: 'Enter your first name...',
   loadingLabel: 'Loading...',
   signinLabel: 'Sign In',
   signupLabel: 'Sign Up',

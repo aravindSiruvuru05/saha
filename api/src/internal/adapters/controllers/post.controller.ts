@@ -97,7 +97,7 @@ export const getUserRides = catchAsync(
 
 export const findRides = catchAsync(
   async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
-    const { fromPlaceID, toPlaceID, startDate } =
+    const { fromPlaceID, toPlaceID, startDate, endDate } =
       req.query as unknown as IGetRidesReq
 
     if (!fromPlaceID || !toPlaceID || !startDate) {
@@ -121,6 +121,7 @@ export const findRides = catchAsync(
       fromLocation,
       toLocation,
       startDate,
+      endDate,
     })
     if (!rides || rides.length === 0) {
       return res.status(STATUS_CODES.OK).json({

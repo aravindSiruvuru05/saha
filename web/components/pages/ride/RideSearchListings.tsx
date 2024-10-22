@@ -1,10 +1,12 @@
-import { ArrowLeft, Star, UserCircle2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIonRouter } from '@ionic/react';
-import { useFindRidesQuery, useDistanceDetailsQuery } from '@/store/apiSlice';
+import { useFindRidesQuery } from '@/store/apiSlice';
 import RideCardsList from '@/components/ui/commonComponents/RideCardsList';
 import { Loading } from '@/components/ui/commonComponents/Loading';
+import { useEffect } from 'react';
+import { getStartAndEndOfDay } from '@/utils/common';
 
 export const RideSearchListings = () => {
   const location = useLocation();
@@ -14,29 +16,40 @@ export const RideSearchListings = () => {
   const rideDate = decodeURIComponent(query.get('date') || '');
 
   const router = useIonRouter();
-  const {
-    data: distaceData,
-    error: distanceFetchingError,
-    isLoading: isDistanceFetching,
-  } = useDistanceDetailsQuery({
-    originPlaceID: fromID,
-    destinationPlaceID: toID,
-  });
+  // const {
+  //   data: distaceData,
+  //   error: distanceFetchingError,
+  //   isLoading: isDistanceFetching,
+  // } = useDistanceDetailsQuery({
+  //   originPlaceID: fromID,
+  //   destinationPlaceID: toID,
+  // });
+
+  const { startOfLocalDayISO, endOfLocalDayISO } =
+    getStartAndEndOfDay(rideDate);
 
   const {
     data: ridesData,
     error: ridesFetchingError,
     isLoading: isRidesFetching,
-  } = useFindRidesQuery({
-    fromPlaceID: fromID!,
-    toPlaceID: toID!,
-    startDate: rideDate!,
-  });
+    refetch,
+  } = useFindRidesQuery(
+    {
+      fromPlaceID: fromID!,
+      toPlaceID: toID!,
+      startDate: startOfLocalDayISO!,
+      endDate: endOfLocalDayISO!,
+    },
+    { skip: !startOfLocalDayISO || !endOfLocalDayISO },
+  );
 
-  if (!fromID || !toID || !rideDate) {
-    router.push('/rides-home', 'root');
-    return <div />;
-  }
+  useEffect(() => {
+    if (fromID && toID && startOfLocalDayISO && endOfLocalDayISO) {
+      refetch();
+    } else {
+      router.push('/rides-home', 'root');
+    }
+  }, []);
 
   //TODO: get the distance and time between the from and to locaitons from BE with distance matrix
 
@@ -66,7 +79,7 @@ export const RideSearchListings = () => {
           )}
         </div>
       </div>
-      {isDistanceFetching || isRidesFetching ? (
+      {isRidesFetching ? (
         <Loading />
       ) : (
         <RideCardsList rideListings={ridesData?.rides!} isBooking />

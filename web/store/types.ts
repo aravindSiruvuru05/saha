@@ -15,7 +15,8 @@ export interface ISigninPayload {
 }
 
 export interface ISignupPayload {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirm_password: string;
@@ -93,4 +94,5 @@ export interface IFindRidesReqQuery {
   fromPlaceID: string;
   toPlaceID: string;
   startDate: string;
+  endDate: string;
 }

@@ -57,7 +57,7 @@ exports.up = (pgm) => {
       notNull: true,
     },
     start_time: {
-      type: 'timestamp',
+      type: 'timestamptz',
       notNull: true, // Start time of the trip
     },
     duration: {
@@ -75,7 +75,7 @@ exports.up = (pgm) => {
       default: pgm.func('NOW()'), // Default to current timestamp
     },
     updated_at: {
-      type: 'timestamp',
+      type: 'timestamptz',
       notNull: true,
       default: pgm.func('NOW()'), // Default to current timestamp
     },

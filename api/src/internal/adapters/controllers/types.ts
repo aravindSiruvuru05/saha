@@ -8,6 +8,7 @@ export interface IGetRidesReq {
   fromPlaceID: string
   toPlaceID: string
   startDate?: string
+  endDate: string
 }
 
 export interface ILocation {
