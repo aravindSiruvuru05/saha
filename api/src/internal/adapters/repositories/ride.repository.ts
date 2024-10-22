@@ -165,14 +165,11 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     startDate,
     endDate,
   }: IFindRidesParams): Promise<IPost<IRide>[]> {
-    const params: any[] = [
-      fromLocation.neighborhood,
-      fromLocation.locality,
-      fromLocation.city,
-      toLocation.neighborhood,
-      toLocation.locality,
-      toLocation.city,
-    ]
+    const params: any[] = []
+    let conditions: string[] = []
+    const locationParams: { [key: string]: number } = {}
+    fromLocation.city = ''
+    fromLocation.neighborhood = ''
     let query = `
       SELECT r.*, 
             u.id AS user_id, 
@@ -191,25 +188,87 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
       JOIN users u ON r.user_id = u.id
-      WHERE (
-        (startLoc.neighborhood = $1 AND endLoc.neighborhood = $4)
-        OR (startLoc.neighborhood = $1 AND endLoc.locality = $5)
-        OR (startLoc.locality = $2 AND endLoc.locality = $5)
-        OR (startLoc.neighborhood = $1 AND endLoc.city = $6)
-        OR (startLoc.locality = $2 AND endLoc.city = $6)
-        OR (startLoc.city = $3 AND endLoc.city = $6)
-      )
+      WHERE 1 = 1
     `
-    // Extract the date part from the startDate
-    const [datePart] = startDate?.split('T')
+
+    // Add fromLocation.neighborhood only once
+    if (fromLocation.neighborhood) {
+      locationParams['fromNeighborhood'] = params.length + 1
+      params.push(fromLocation.neighborhood)
+    }
+
+    // Add toLocation.neighborhood only once
+    if (toLocation.neighborhood) {
+      locationParams['toNeighborhood'] = params.length + 1
+      params.push(toLocation.neighborhood)
+    }
+
+    // Add toLocation.locality only once
+    if (toLocation.locality) {
+      locationParams['toLocality'] = params.length + 1
+      params.push(toLocation.locality)
+    }
+
+    // Add fromLocation.locality only once
+    if (fromLocation.locality) {
+      locationParams['fromLocality'] = params.length + 1
+      params.push(fromLocation.locality)
+    }
+
+    // Add toLocation.city only once
+    if (toLocation.city) {
+      locationParams['toCity'] = params.length + 1
+      params.push(toLocation.city)
+    }
+
+    // Add fromLocation.city only once
+    if (fromLocation.city) {
+      locationParams['fromCity'] = params.length + 1
+      params.push(fromLocation.city)
+    }
+
+    // Build the conditions based on the already added parameters
+    if (fromLocation.neighborhood && toLocation.neighborhood) {
+      conditions.push(
+        `(startLoc.neighborhood = $${locationParams['fromNeighborhood']} AND endLoc.neighborhood = $${locationParams['toNeighborhood']})`,
+      )
+    }
+
+    if (fromLocation.neighborhood && toLocation.locality) {
+      conditions.push(
+        `(startLoc.neighborhood = $${locationParams['fromNeighborhood']} AND endLoc.locality = $${locationParams['toLocality']})`,
+      )
+    }
+
+    if (fromLocation.locality && toLocation.locality) {
+      conditions.push(
+        `(startLoc.locality = $${locationParams['fromLocality']} AND endLoc.locality = $${locationParams['toLocality']})`,
+      )
+    }
+
+    if (fromLocation.locality && toLocation.city) {
+      conditions.push(
+        `(startLoc.locality = $${locationParams['fromLocality']} AND endLoc.city = $${locationParams['toCity']})`,
+      )
+    }
+
+    if (fromLocation.city && toLocation.city) {
+      conditions.push(
+        `(startLoc.city = $${locationParams['fromCity']} AND endLoc.city = $${locationParams['toCity']})`,
+      )
+    }
+
+    // Add location conditions to the query
+    if (conditions.length > 0) {
+      query += ` AND (${conditions.join(' OR ')})`
+    }
 
     // If a startDate is provided, add conditions to the query
     if (startDate) {
-      query += ` AND r.start_time >= $7 AND r.start_time < $8`
+      query += ` AND r.start_time >= $${params.length + 1} AND r.start_time < $${params.length + 2}`
       params.push(startDate, endDate)
     }
 
-    console.log(query, params, startDate, '=====')
     const result = await this.pool.query(query, params)
 
     return result.rows.map(this.fromRow)
