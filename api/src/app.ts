@@ -15,6 +15,7 @@ import { protect } from './internal/adapters/controllers/auth.controller'
 import { Ride } from './internal/domain/ride'
 import { RideRepository } from './internal/adapters/repositories/ride.repository'
 import { LocationRepository } from './internal/adapters/repositories/location.repository'
+import { RideRequestsRepository } from './internal/adapters/repositories/ride_requests.repository'
 
 const app = express()
 
@@ -48,6 +49,7 @@ export const injectModels = (
   req.repositories = {
     user: new UserRepository(pool),
     ride: new RideRepository(pool),
+    rideRequests: new RideRequestsRepository(pool),
     location: new LocationRepository(pool),
   }
   next()

@@ -1,5 +1,6 @@
 import { UUID } from 'crypto'
 import { ILocation } from '../adapters/controllers/types'
+import { RideRequestStatus } from '../adapters/repositories/types'
 
 export enum IUserRole {
   ADMIN,
@@ -33,6 +34,7 @@ export interface IPost<T = unknown> extends IWithId {
   details: T
   about: string
   type: IRideType
+  currUserReqStatus: RideRequestStatus
 }
 
 export interface IRide {

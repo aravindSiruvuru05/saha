@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import catchAsync from '../../../shared/utils/catchAsync'
 import AppError from '../../../shared/utils/appError'
 import { STATUS_CODES } from '../../../shared/utils'
-import { toZonedTime } from 'date-fns-tz'
 import { ICreateRideRequest, IGetRidesReq } from './types'
 import { getPlaceDetails } from '../../serviceHandlers/google.service'
+import { UUID } from 'crypto'
 
 // Create a new ride
 export const createPost = catchAsync(
@@ -77,14 +77,7 @@ export const createPost = catchAsync(
 export const getUserRides = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.currUser.id
-
     const userRides = await req.repositories.ride.findRidesByUserID(userId)
-
-    if (!userRides || userRides.length === 0) {
-      return next(
-        new AppError('No rides found for the user', STATUS_CODES.BAD_REQUEST),
-      )
-    }
 
     // Return the fetched rides in the response
     res.status(STATUS_CODES.OK).json({
@@ -95,7 +88,30 @@ export const getUserRides = catchAsync(
   },
 )
 
-export const findRides = catchAsync(
+export const getRideByID = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params
+    const ride = await req.repositories.ride.findRideByID(
+      id as UUID,
+      req.currUser.id,
+    )
+
+    if (!ride) {
+      return next(
+        new AppError('No rides found for the user', STATUS_CODES.BAD_REQUEST),
+      )
+    }
+
+    // Return the fetched rides in the response
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        ...ride,
+      },
+    })
+  },
+)
+
+export const searchRides = catchAsync(
   async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
     const { fromPlaceID, toPlaceID, startDate, endDate } =
       req.query as unknown as IGetRidesReq
@@ -117,12 +133,15 @@ export const findRides = catchAsync(
     // }
 
     // Find rides between the locations
-    const rides = await req.repositories.ride.findRides({
-      fromLocation,
-      toLocation,
-      startDate,
-      endDate,
-    })
+    const rides = await req.repositories.ride.findRides(
+      {
+        fromLocation,
+        toLocation,
+        startDate,
+        endDate,
+      },
+      req.currUser.id,
+    )
     if (!rides || rides.length === 0) {
       return res.status(STATUS_CODES.OK).json({
         data: {

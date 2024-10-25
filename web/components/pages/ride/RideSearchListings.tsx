@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIonRouter } from '@ionic/react';
-import { useFindRidesQuery } from '@/store/apiSlice';
+import { useSearchRidesQuery } from '@/store/apiSlice';
 import RideCardsList from '@/components/ui/commonComponents/RideCardsList';
 import { Loading } from '@/components/ui/commonComponents/Loading';
 import { useEffect } from 'react';
@@ -33,7 +33,7 @@ export const RideSearchListings = () => {
     error: ridesFetchingError,
     isLoading: isRidesFetching,
     refetch,
-  } = useFindRidesQuery(
+  } = useSearchRidesQuery(
     {
       fromPlaceID: fromID!,
       toPlaceID: toID!,
@@ -46,16 +46,13 @@ export const RideSearchListings = () => {
   useEffect(() => {
     if (fromID && toID && startOfLocalDayISO && endOfLocalDayISO) {
       refetch();
-    } else {
-      router.push('/rides-home', 'root');
     }
   }, [fromID, toID, startOfLocalDayISO, endOfLocalDayISO, refetch]);
 
   //TODO: get the distance and time between the from and to locaitons from BE with distance matrix
 
   return (
-    <div className="max-h-screen flex flex-col bg-gray-100 h-screen">
-      {/* Top bar */}
+    <>
       <div className="sticky top-0 z-10 bg-white shadow-md  pb-4 py-4 flex items-center space-x-4 px-4">
         <Button
           variant="ghost"
@@ -79,11 +76,15 @@ export const RideSearchListings = () => {
           )}
         </div>
       </div>
-      {isRidesFetching ? (
-        <Loading />
-      ) : (
-        <RideCardsList rideListings={ridesData?.rides!} isBooking />
-      )}
-    </div>
+      <div className="h-[85vh] flex flex-col container pb-4 p-4 m-auto">
+        {/* Top bar */}
+
+        {isRidesFetching ? (
+          <Loading />
+        ) : (
+          <RideCardsList rideListings={ridesData?.rides!} isBooking />
+        )}
+      </div>
+    </>
   );
 };

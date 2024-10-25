@@ -25,7 +25,7 @@ export const SingleSelect = <
 }: ISingleSelectProps<T>) => {
   return (
     <div className="flex flex-col w-[100%] gap-3">
-      <Label htmlFor="date">{label}</Label>
+      <Label htmlFor="time">{label}</Label>
       <Select onValueChange={onSelect} value={value || undefined}>
         <SelectTrigger id="time" className="w-full">
           <SelectValue placeholder={placeholder} />

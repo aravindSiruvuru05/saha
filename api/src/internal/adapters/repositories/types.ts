@@ -1,3 +1,4 @@
+import { UUID } from 'crypto'
 import { IWithId } from '../../domain/types'
 
 export enum IUserRoleEntity {
@@ -15,4 +16,17 @@ export interface IUserEntity extends IWithId {
   role: IUserRoleEntity
   password: string
   passwordChangedAt?: string
+}
+
+export enum RideRequestStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
+export interface IRideRequest {
+  id: UUID
+  userID: UUID
+  rideID: UUID
+  status: RideRequestStatus
 }

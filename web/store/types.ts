@@ -69,6 +69,7 @@ export interface IPost<T = unknown> extends IWithID {
   details: T;
   about: string;
   type: IRideType;
+  currUserReqStatus: RideRequestStatus;
 }
 
 export interface IRide {
@@ -98,4 +99,25 @@ export interface IFindRidesReqQuery {
   toPlaceID: string;
   startDate: string;
   endDate: string;
+}
+
+export interface IGetRideReqQuery {
+  id: string;
+}
+
+export interface IJoinRideRequest {
+  rideID: string;
+}
+
+export enum RideRequestStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
+export interface IRideRequestResponse {
+  id: UUID;
+  userID: UUID;
+  rideID: UUID;
+  status: RideRequestStatus;
 }

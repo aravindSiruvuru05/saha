@@ -24,7 +24,6 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
   constructor(pool: Pool) {
     super(pool, 'rides')
   }
-
   private fromRow(row: QueryResultRow): IPost<IRide> {
     return {
       id: row.id,
@@ -32,18 +31,19 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         id: row.user_id,
         firstName: row.first_name,
         lastName: row.last_name,
+        pic: row.user_pic,
       },
       type: IRideType.RIDE,
       about: row.details,
       details: {
         fromLocation: {
-          googlePlaceID: row.start_placeID,
+          googlePlaceID: row.start_place_id,
           neighborhood: row.start_neighborhood,
           locality: row.start_locality,
           city: row.start_city,
         },
         toLocation: {
-          googlePlaceID: row.end_placeID,
+          googlePlaceID: row.end_place_id,
           neighborhood: row.end_neighborhood,
           locality: row.end_locality,
           city: row.end_city,
@@ -53,9 +53,9 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         startTime: row.start_time,
         duration: row.duration,
       },
+      currUserReqStatus: row.request_status,
     }
   }
-
   private toRow(
     ride: Partial<IPost<Partial<IRideEntity>>>,
   ): Partial<QueryResultRow> {
@@ -88,46 +88,51 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     if (ride.details?.duration !== undefined) {
       row.end_time = ride.details.duration
     }
+    if (ride.currUserReqStatus !== undefined) {
+      row.currUserReqStatus = ride.currUserReqStatus
+    }
 
     return row
   }
 
   public async create(
-    item: Omit<IPost<Omit<IRideEntity, 'seatsFilled'>>, 'id' | 'type'>,
+    item: Omit<
+      IPost<Omit<IRideEntity, 'seatsFilled'>>,
+      'id' | 'type' | 'currUserReqStatus'
+    >,
   ): Promise<IPost<IRide> | null> {
     const row = await super.create(this.toRow(item))
     return row ? this.fromRow(row) : null
   }
 
-  public async findByID(id: string): Promise<IPost<IRide> | null> {
+  public async findRideByID(
+    id: string,
+    userID: string,
+  ): Promise<IPost<IRide> | null> {
     const query = `
       SELECT r.*, 
-            u.id AS user_id, 
-            u.first_name AS first_name, 
-            u.last_name AS last_name,
-            u.pic AS user_pic,
-            startLoc.google_place_id AS start_place_id, 
-            startLoc.neighborhood AS start_neighborhood, 
-            startLoc.locality AS start_locality, 
-            startLoc.city AS start_city, 
-            startLoc.state AS start_state, 
-            startLoc.country AS start_country, 
-            startLoc.description AS start_description,
-            endLoc.google_place_id AS end_place_id,
-            endLoc.neighborhood AS end_neighborhood, 
-            endLoc.locality AS end_locality, 
-            endLoc.city AS end_city, 
-            endLoc.state AS end_state, 
-            endLoc.country AS end_country, 
-            endLoc.description AS end_description
+             u.id AS user_id, 
+             u.first_name AS first_name, 
+             u.last_name AS last_name,
+             u.pic AS user_pic,
+             startLoc.google_place_id AS start_place_id, 
+             startLoc.neighborhood AS start_neighborhood, 
+             startLoc.locality AS start_locality, 
+             startLoc.city AS start_city, 
+             endLoc.google_place_id AS end_place_id,
+             endLoc.neighborhood AS end_neighborhood, 
+             endLoc.locality AS end_locality, 
+             endLoc.city AS end_city,
+             rr.status AS request_status
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
       JOIN users u ON r.user_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $2
       WHERE r.id = $1
     `
 
-    const { rows } = await this.pool.query(query, [id])
+    const { rows } = await this.pool.query(query, [id, userID])
     const row = rows[0]
 
     return row ? this.fromRow(row) : null
@@ -147,24 +152,24 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
             endLoc.google_place_id AS end_place_id, 
             endLoc.neighborhood AS end_neighborhood, 
             endLoc.locality AS end_locality, 
-            endLoc.city AS end_city
+            endLoc.city AS end_city,
+            rr.status AS request_status
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
       JOIN users u ON r.user_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $1
       WHERE u.id = $1
     `
     const { rows } = await this.pool.query(query, [userID])
 
-    return !!rows ? rows.map(this.fromRow) : null
+    return rows.length > 0 ? rows.map(this.fromRow) : []
   }
 
-  public async findRides({
-    fromLocation,
-    toLocation,
-    startDate,
-    endDate,
-  }: IFindRidesParams): Promise<IPost<IRide>[]> {
+  public async findRides(
+    { fromLocation, toLocation, startDate, endDate }: IFindRidesParams,
+    userID: string,
+  ): Promise<IPost<IRide>[]> {
     const params: any[] = []
     let conditions: string[] = []
     const locationParams: { [key: string]: number } = {}
@@ -183,13 +188,18 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
             endLoc.google_place_id AS end_place_id, 
             endLoc.neighborhood AS end_neighborhood, 
             endLoc.locality AS end_locality, 
-            endLoc.city AS end_city
+            endLoc.city AS end_city,
+            rr.status AS request_status
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
       JOIN users u ON r.user_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $${params.length + 1}
       WHERE 1 = 1
     `
+
+    // Add the userID to the params for the LEFT JOIN
+    params.push(userID)
 
     // Add fromLocation.neighborhood only once
     if (fromLocation.neighborhood) {

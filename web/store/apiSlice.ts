@@ -11,8 +11,11 @@ import {
   ICreateRideRequest,
   IFindRidesReqQuery,
   IFindRidesRes,
+  IGetRideReqQuery,
+  IJoinRideRequest,
   IPost,
   IRide,
+  IRideRequestResponse,
 } from './types';
 import { UUID } from 'crypto';
 
@@ -170,18 +173,36 @@ export const apiSlice = createApi({
         return rawRes.data;
       },
     }),
-    findRides: builder.query<IFindRidesRes, IFindRidesReqQuery>({
+    joinRide: builder.mutation<IRideRequestResponse, IJoinRideRequest>({
+      query: data => ({
+        url: 'api/v1/posts/rides/join-ride',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse>) => {
+        return rawRes.data;
+      },
+    }),
+    searchRides: builder.query<IFindRidesRes, IFindRidesReqQuery>({
       query: params => ({
-        url: 'api/v1/posts/find-rides',
+        url: 'api/v1/posts/rides/search-rides',
         params,
       }),
       transformResponse: (rawRes: IApiResponse<IFindRidesRes>) => {
         return rawRes.data;
       },
     }),
+    getRideByID: builder.query<IPost<IRide>, IGetRideReqQuery>({
+      query: ({ id }) => ({
+        url: `api/v1/posts/rides/${id}`,
+      }),
+      transformResponse: (rawRes: IApiResponse<IPost<IRide>>) => {
+        return rawRes.data;
+      },
+    }),
     getMyRides: builder.query<IFindRidesRes['rides'], any>({
       query: () => ({
-        url: 'api/v1/posts/rides',
+        url: `api/v1/posts/rides/my-rides`,
       }),
       transformResponse: (
         rawRes: IApiResponse<
@@ -224,7 +245,9 @@ export const {
   useLazyDistanceDetailsQuery,
   useDistanceDetailsQuery,
   useLazyPlaceDetailsQuery,
-  useFindRidesQuery,
+  useSearchRidesQuery,
   useGetMyRidesQuery,
+  useGetRideByIDQuery,
+  useJoinRideMutation,
   useCreatePostMutation,
 } = apiSlice;

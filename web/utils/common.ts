@@ -1,14 +1,30 @@
 import { isValid } from 'date-fns';
+import { IPlaceDetails } from './google_places';
 
 export const getFullName = ({
   firstName,
   lastName,
 }: {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 }) => {
+  if (!firstName) firstName = '';
+  if (!lastName) lastName = '';
   return firstName + ' ' + lastName;
 };
+
+export const getInitialsOfName = ({
+  firstName,
+  lastName,
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  if (!firstName) firstName = '';
+  if (!lastName) lastName = '';
+  return firstName[0] + ' ' + lastName[0];
+};
+
 export const getStartAndEndOfDay = (
   isoString: string,
 ): {
@@ -45,4 +61,8 @@ export const getStartAndEndOfDay = (
     startOfLocalDayISO,
     endOfLocalDayISO,
   };
+};
+
+export const getLocationLable = (location: IPlaceDetails): string => {
+  return `${location.neighborhood || location.locality}, ${location.city}`;
 };

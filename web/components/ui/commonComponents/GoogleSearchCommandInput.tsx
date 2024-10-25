@@ -108,10 +108,11 @@ export const GoogleSearchCommandInput = ({
 
   return (
     <div className="w-[100%]">
-      <Label htmlFor="date">{label}</Label>
+      <Label htmlFor="search-input">{label}</Label>
       <div className="flex items-center border rounded-md shadow-sm bg-white gap-2 w-full max-w-[400px]">
         <MapPin className="ml-2 text-gray-500 h-4 w-4" />
         <Input
+          id="search-input"
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
           className="border-hidden shadow-none"

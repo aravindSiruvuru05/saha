@@ -10,7 +10,7 @@ exports.shorthands = undefined
  */
 exports.up = (pgm) => {
   // Create the enum type for booking status
-  pgm.createType('booking_status_enum', ['pending', 'confirmed', 'rejected'])
+  pgm.createType('booking_status_enum', ['pending', 'accepted', 'declined'])
 
   // Create ride_requests table for ride bookings
   pgm.createTable('ride_requests', {
