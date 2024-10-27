@@ -66,7 +66,7 @@ const RideCardsList: React.FC<RideCardsListProps> = ({
   }
 
   return (
-    <ScrollArea className="flex-grow overflow-auto">
+    <ScrollArea className="flex-grow overflow-auto pb-28">
       <div className="space-y-4">
         {rideListings.map(ride => {
           const isPastRide = isBefore(
