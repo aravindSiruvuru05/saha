@@ -11,6 +11,8 @@ import { Signup } from './pages/Signup';
 import { RideHomeLayout } from './pages/ride/RideHomeLayout';
 import { RideSearchListings } from './pages/ride/RideSearchListings';
 import { ActiveTabProvider } from './pages/ActiveTabContext';
+import { RideDetails } from './pages/ride/RideDetails';
+import { Notifications } from './pages/Notifications';
 
 setupIonicReact({});
 
@@ -46,6 +48,12 @@ const AppShell = () => {
             </ProtectedRoute>
             <ProtectedRoute path="/search-listings" exact>
               <RideSearchListings />
+            </ProtectedRoute>
+            <ProtectedRoute path="/ride-details" exact>
+              <RideDetails />
+            </ProtectedRoute>
+            <ProtectedRoute path="/notifications" exact>
+              <Notifications />
             </ProtectedRoute>
 
             {/* Add other protected routes here */}

@@ -57,8 +57,8 @@ export const Signup = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen  md:bg-primary bg-transparent">
-      <Card className="w-full max-w-sm mx-5 shadow-none border-none md:shadow md:border">
+    <div className="flex items-center justify-center h-screen overflow-y-auto  md:bg-primary bg-transparent">
+      <Card className="w-full max-w-md mx-5 mt-8 shadow-none border-none md:shadow md:border">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
             Sign Up
@@ -66,72 +66,78 @@ export const Signup = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="first-name">First Name</Label>
-              <Input
-                id="first-name"
-                type="text"
-                placeholder={APP_LABELS.firstNamePlaceholder}
-                required
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-              />
+            <div className="flex flex-col md:flex-row gap-3 justify-between">
+              <div className="space-y-2">
+                <Label htmlFor="first-name">First Name</Label>
+                <Input
+                  id="first-name"
+                  type="text"
+                  placeholder={APP_LABELS.firstNamePlaceholder}
+                  required
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="last-name">Last Name</Label>
+                <Input
+                  id="last-name"
+                  type="text"
+                  placeholder={APP_LABELS.lastNamePlaceholder}
+                  required
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Last Name</Label>
-              <Input
-                id="last-name"
-                type="text"
-                placeholder={APP_LABELS.lastNamePlaceholder}
-                required
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-              />
+            <div className="flex flex-col md:flex-row gap-3 justify-between">
+              <div className="space-y-2">
+                <Label htmlFor="phone-number">Phonenumber</Label>
+                <Input
+                  id="phone-number"
+                  type="text"
+                  maxLength={10}
+                  placeholder={APP_LABELS.phoneNumberPlaceholder}
+                  required
+                  value={phoneNumber}
+                  onChange={e => setPhoneNumber(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={APP_LABELS.emailPlaceholder}
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Phonenumber</Label>
-              <Input
-                id="phone-number"
-                type="text"
-                maxLength={10}
-                placeholder={APP_LABELS.phoneNumberPlaceholder}
-                required
-                value={phoneNumber}
-                onChange={e => setPhoneNumber(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={APP_LABELS.emailPlaceholder}
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={APP_LABELS.passwordPlaceholder}
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder={APP_LABELS.confirmPasswordPlaceholder}
-                required
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
+            <div className="flex flex-col md:flex-row gap-3 justify-between">
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder={APP_LABELS.passwordPlaceholder}
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder={APP_LABELS.confirmPasswordPlaceholder}
+                  required
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                />
+              </div>
             </div>
             {(error || apiError) && (
               <Alert variant="destructive">
@@ -139,7 +145,7 @@ export const Signup = () => {
                 <AlertDescription>{error || apiError}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full" disabled={isCreating}>
+            <Button type="submit" className="w-full mt-4" disabled={isCreating}>
               {isCreating ? APP_LABELS.loadingLabel : APP_LABELS.signupLabel}
             </Button>
           </form>

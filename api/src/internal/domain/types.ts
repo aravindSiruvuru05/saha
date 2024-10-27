@@ -1,5 +1,6 @@
 import { UUID } from 'crypto'
 import { ILocation } from '../adapters/controllers/types'
+import { RideRequestStatus } from '../adapters/repositories/types'
 
 export enum IUserRole {
   ADMIN,
@@ -29,10 +30,11 @@ export enum IRideType {
 }
 
 export interface IPost<T = unknown> extends IWithId {
-  user: Partial<IUser>
+  host: Partial<IUser>
   details: T
   about: string
   type: IRideType
+  currUserReqStatus: RideRequestStatus
 }
 
 export interface IRide {
@@ -56,6 +58,13 @@ export interface IHouseAccommodation {
   price: number
   availableFrom: Date
   numberOfMembers: number
+}
+
+export interface IRideRequest {
+  id: UUID
+  ridePost: Partial<IPost<IRide>>
+  status: RideRequestStatus
+  requester: Partial<IUser>
 }
 
 export type HouseAccommodationPost = IPost<IHouseAccommodation>

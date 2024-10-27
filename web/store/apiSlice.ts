@@ -8,11 +8,16 @@ import {
 
 import { IPlaceDetails } from '@/utils/google_places';
 import {
+  IAcceptRideRequest,
+  ICancelRideRequest,
   ICreateRideRequest,
-  IFindRidesReqQuery,
-  IFindRidesRes,
+  ISearchRidesReqQuery,
+  ISearchRidesRes,
+  IGetRideReqQuery,
+  IJoinRideRequest,
   IPost,
   IRide,
+  IRideRequestResponse,
 } from './types';
 import { UUID } from 'crypto';
 
@@ -162,7 +167,7 @@ export const apiSlice = createApi({
     }),
     createPost: builder.mutation<IPost<IRide>, ICreateRideRequest>({
       query: data => ({
-        url: 'api/v1/posts/rides',
+        url: 'api/v1/rides',
         method: 'POST',
         body: data,
       }),
@@ -170,24 +175,80 @@ export const apiSlice = createApi({
         return rawRes.data;
       },
     }),
-    findRides: builder.query<IFindRidesRes, IFindRidesReqQuery>({
-      query: params => ({
-        url: 'api/v1/posts/find-rides',
-        params,
+    joinRide: builder.mutation<IRideRequestResponse, IJoinRideRequest>({
+      query: data => ({
+        url: `api/v1/rides/requests/join`,
+        method: 'POST',
+        body: data,
       }),
-      transformResponse: (rawRes: IApiResponse<IFindRidesRes>) => {
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse>) => {
         return rawRes.data;
       },
     }),
-    getMyRides: builder.query<IFindRidesRes['rides'], any>({
+    cancelRide: builder.mutation<IRideRequestResponse, ICancelRideRequest>({
+      query: data => ({
+        url: `api/v1/rides/requests/cancel`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse>) => {
+        return rawRes.data;
+      },
+    }),
+    acceptRequest: builder.mutation<IRideRequestResponse, IAcceptRideRequest>({
+      query: data => ({
+        url: 'api/v1/rides/requests/accept',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse>) => {
+        return rawRes.data;
+      },
+    }),
+    declineRequest: builder.mutation<IRideRequestResponse, IAcceptRideRequest>({
+      query: data => ({
+        url: 'api/v1/rides/requests/decline',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse>) => {
+        return rawRes.data;
+      },
+    }),
+    searchRides: builder.query<ISearchRidesRes, ISearchRidesReqQuery>({
+      query: params => ({
+        url: 'api/v1/rides/search',
+        params,
+      }),
+      transformResponse: (rawRes: IApiResponse<ISearchRidesRes>) => {
+        return rawRes.data;
+      },
+    }),
+    pendingRequests: builder.query<IRideRequestResponse[], any>({
       query: () => ({
-        url: 'api/v1/posts/rides',
+        url: 'api/v1/rides/requests/pending/received',
+      }),
+      transformResponse: (rawRes: IApiResponse<IRideRequestResponse[]>) => {
+        return rawRes.data;
+      },
+    }),
+    getRideByID: builder.query<IPost<IRide>, IGetRideReqQuery>({
+      query: ({ id }) => ({
+        url: `api/v1/rides/${id}`,
+      }),
+      transformResponse: (rawRes: IApiResponse<IPost<IRide>>) => {
+        return rawRes.data;
+      },
+    }),
+    getMyRides: builder.query<ISearchRidesRes['rides'], any>({
+      query: () => ({
+        url: `api/v1/rides/my-rides`,
       }),
       transformResponse: (
         rawRes: IApiResponse<
-          Omit<IFindRidesRes, 'fromLocation' | 'toLocation'>
+          Omit<ISearchRidesRes, 'fromLocation' | 'toLocation'>
         >,
-      ): IFindRidesRes['rides'] => {
+      ): ISearchRidesRes['rides'] => {
         return rawRes.data.rides;
       },
     }),
@@ -224,7 +285,13 @@ export const {
   useLazyDistanceDetailsQuery,
   useDistanceDetailsQuery,
   useLazyPlaceDetailsQuery,
-  useFindRidesQuery,
+  useSearchRidesQuery,
   useGetMyRidesQuery,
+  useGetRideByIDQuery,
+  useAcceptRequestMutation,
+  usePendingRequestsQuery,
+  useDeclineRequestMutation,
+  useCancelRideMutation,
+  useJoinRideMutation,
   useCreatePostMutation,
 } = apiSlice;

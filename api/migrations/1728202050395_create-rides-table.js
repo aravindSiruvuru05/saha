@@ -17,7 +17,7 @@ exports.up = (pgm) => {
       primaryKey: true, // Set as primary key
       default: pgm.func('gen_random_uuid()'), // Generates a random UUID
     },
-    user_id: {
+    host_id: {
       type: 'uuid',
       notNull: true,
       references: {
@@ -84,6 +84,7 @@ exports.up = (pgm) => {
   // Create indexes for the rides table
   pgm.createIndex('rides', ['from_location_id'])
   pgm.createIndex('rides', ['to_location_id'])
+  pgm.createIndex('rides', ['host_id'])
 
   // Create the trigger for the rides table
   pgm.sql(`
@@ -101,6 +102,7 @@ exports.up = (pgm) => {
  */
 exports.down = (pgm) => {
   // Drop the indexes first
+  pgm.dropIndex('rides', ['host_id'])
   pgm.dropIndex('rides', ['from_location_id'])
   pgm.dropIndex('rides', ['to_location_id'])
 

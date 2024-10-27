@@ -10,7 +10,12 @@ exports.shorthands = undefined
  */
 exports.up = (pgm) => {
   // Create the enum type for booking status
-  pgm.createType('booking_status_enum', ['pending', 'confirmed', 'rejected'])
+  pgm.createType('booking_status_enum', [
+    'pending',
+    'accepted',
+    'declined',
+    'canceled',
+  ])
 
   // Create ride_requests table for ride bookings
   pgm.createTable('ride_requests', {
@@ -29,7 +34,7 @@ exports.up = (pgm) => {
       },
       onDelete: 'CASCADE', // If the ride is deleted, cascade the deletion
     },
-    user_id: {
+    requester_id: {
       type: 'uuid',
       notNull: true,
       references: {
@@ -55,12 +60,17 @@ exports.up = (pgm) => {
     },
   })
 
+  // Add a composite unique constraint for (user_id, ride_id)
+  pgm.addConstraint('ride_requests', 'unique_user_id_ride_id', {
+    unique: ['requester_id', 'ride_id'],
+  })
+
   // Create the trigger for the ride_requests table
   pgm.sql(`
-   CREATE TRIGGER set_updated_at_ride_requests
-   BEFORE UPDATE ON ride_requests
-   FOR EACH ROW
-   EXECUTE FUNCTION update_updated_at_column();
+    CREATE TRIGGER set_updated_at_ride_requests
+    BEFORE UPDATE ON ride_requests
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
   `)
 }
 
@@ -75,7 +85,11 @@ exports.down = (pgm) => {
     'DROP TRIGGER IF EXISTS set_updated_at_ride_requests ON ride_requests;',
   )
 
-  pgm.dropTable('ride_requests') // Drop ride_requests table
+  // Drop the unique constraint
+  pgm.dropConstraint('ride_requests', 'unique_user_id_ride_id')
+
+  // Drop the ride_requests table
+  pgm.dropTable('ride_requests')
 
   // Drop the enum type
   pgm.dropType('booking_status_enum')

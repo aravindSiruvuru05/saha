@@ -5,7 +5,7 @@ import cors from 'cors' // Import the cors package
 import AppError from './shared/utils/appError'
 import { router as userRouter } from './infra/routers/user.router'
 import authRouter from './infra/routers/auth.router'
-import postRouter from './infra/routers/post.router'
+import rideRouter from './infra/routers/ride.router'
 import googleRouter from './infra/routers/googleMaps.router'
 import globalErrorHandler from './internal/adapters/controllers/error.controller'
 import pool from './infra/db'
@@ -15,6 +15,7 @@ import { protect } from './internal/adapters/controllers/auth.controller'
 import { Ride } from './internal/domain/ride'
 import { RideRepository } from './internal/adapters/repositories/ride.repository'
 import { LocationRepository } from './internal/adapters/repositories/location.repository'
+import { RideRequestsRepository } from './internal/adapters/repositories/ride_requests.repository'
 
 const app = express()
 
@@ -48,6 +49,7 @@ export const injectModels = (
   req.repositories = {
     user: new UserRepository(pool),
     ride: new RideRepository(pool),
+    rideRequests: new RideRequestsRepository(pool),
     location: new LocationRepository(pool),
   }
   next()
@@ -56,12 +58,11 @@ app.use(injectModels)
 // Route handlers
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', protect, userRouter)
-app.use('/api/v1/posts', protect, postRouter)
+app.use('/api/v1/rides', protect, rideRouter)
 app.use('/api/v1/google', protect, googleRouter)
 
 // Handle undefined routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.url)
   next(new AppError(`Can't find ${req.originalUrl} on this server!!`, 404))
 })
 

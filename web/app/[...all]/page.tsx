@@ -14,8 +14,12 @@ export async function generateStaticParams() {
     { all: ['search-listings'] },
     { all: ['rides-home'] },
     { all: ['tabs'] },
+    { all: ['ride-details'] },
     { all: ['/web/assets/images/images.jpeg'] },
+    { all: ['/_next/static/css/app/display.css.map'] },
+    { all: ['/placeholder.svg'] },
     { all: ['lists'] },
+    { all: ['notifications'] },
     ...lists.map(list => ({ all: ['lists', list.id] })),
     { all: ['settings'] },
   ];
