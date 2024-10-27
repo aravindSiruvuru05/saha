@@ -57,6 +57,7 @@ export const HomePage = () => {
               <Card
                 className="transition-all hover:shadow-lg hover:-translate-y-1 hover:bg-accent active:bg-accent cursor-pointer"
                 onClick={() => router.push(service.route)}
+                key={service.title}
               >
                 <CardHeader className="flex flex-col items-center">
                   <div className="bg-primary/10 p-3 rounded-full mb-4">
