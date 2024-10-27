@@ -208,6 +208,7 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       WHERE 1 = 1
     `
 
+    params.push(userID)
     if (fromLocation.neighborhood && toLocation.neighborhood) {
       conditions.push(
         ` (startLoc.neighborhood = $${params.length + 1} AND endLoc.neighborhood = $${params.length + 2})`,
