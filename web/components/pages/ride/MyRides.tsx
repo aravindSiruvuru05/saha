@@ -20,7 +20,7 @@ export const MyRides = () => {
 
   return (
     <div className="w-full h-screen container mx-auto">
-      <div className="sticky top-0 z-10 bg-white shadow-md font-bold mb-4  pb-4 py-4 flex items-center space-x-4 px-4">
+      <div className="sticky top-0 z-10 bg-white shadow-md font-bold mb-10  pb-4 py-4 flex items-center space-x-4 px-4">
         My Rides
       </div>
       {!!ridePosts ? (
