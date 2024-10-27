@@ -6,11 +6,14 @@ import { useIonRouter } from '@ionic/react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { SwapButton } from '@/components/ui/commonComponents/SwapButton';
 import { GoogleSearchCommandInput } from '@/components/ui/commonComponents/GoogleSearchCommandInput';
-import { IPlaceDetails } from '@/utils/google_places';
 import { APP_LABELS } from '@/utils/labels';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { setFromLocation, setRideDate, setToLocation } from '@/store/ridesSlice';
+import {
+  setFromLocation,
+  setRideDate,
+  setToLocation,
+} from '@/store/ridesSlice';
 
 export const RidesSearch = () => {
   const dispatch = useDispatch();
@@ -47,8 +50,8 @@ export const RidesSearch = () => {
   }, []);
 
   return (
-    <Card className="w-full max-w-md mx-5 bg-accent">
-      <CardContent className="p-6">
+    <Card className="w-full max-w-md mx-auto bg-accent">
+      <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-3 mb-4">
             <div className="flex gap-3">
