@@ -1,7 +1,6 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
 import { IPost, IRide, IRideType } from '../../domain/types'
-import { format } from 'date-fns'
 import { IPlaceDetails } from '../../../shared/utils/googleMaps'
 import { UUID } from 'crypto'
 
@@ -27,8 +26,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
   private fromRow(row: QueryResultRow): IPost<IRide> {
     return {
       id: row.id,
-      user: {
-        id: row.user_id,
+      host: {
+        id: row.host_id,
         firstName: row.first_name,
         lastName: row.last_name,
         pic: row.user_pic,
@@ -56,6 +55,7 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       currUserReqStatus: row.request_status,
     }
   }
+
   private toRow(
     ride: Partial<IPost<Partial<IRideEntity>>>,
   ): Partial<QueryResultRow> {
@@ -64,8 +64,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     if (ride.id !== undefined) {
       row.id = ride.id
     }
-    if (ride.user?.id !== undefined) {
-      row.user_id = ride.user.id
+    if (ride.host?.id !== undefined) {
+      row.host_id = ride.host.id
     }
     if (ride.about !== undefined) {
       row.about = ride.about
@@ -105,13 +105,22 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     return row ? this.fromRow(row) : null
   }
 
+  public async reduceSeatFilled(rideID: UUID): Promise<void> {
+    const query = `
+    UPDATE rides
+    SET seats_filled = seats_filled - 1
+    WHERE id = $1 AND seats_filled > 0
+  `
+    await this.pool.query(query, [rideID])
+  }
+
   public async findRideByID(
     id: string,
-    userID: string,
+    requesterID: string, // to get the currUserReqStatus
   ): Promise<IPost<IRide> | null> {
     const query = `
       SELECT r.*, 
-             u.id AS user_id, 
+             u.id AS host_id, 
              u.first_name AS first_name, 
              u.last_name AS last_name,
              u.pic AS user_pic,
@@ -127,12 +136,12 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.user_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $2
+      JOIN users u ON r.host_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $2
       WHERE r.id = $1
     `
 
-    const { rows } = await this.pool.query(query, [id, userID])
+    const { rows } = await this.pool.query(query, [id, requesterID])
     const row = rows[0]
 
     return row ? this.fromRow(row) : null
@@ -141,7 +150,7 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
   public async findRidesByUserID(userID: UUID): Promise<IPost<IRide>[] | null> {
     let query = `
       SELECT r.*, 
-            u.id AS user_id, 
+            u.id AS host_id, 
             u.first_name AS first_name, 
             u.last_name AS last_name,
             u.pic AS user_pic,
@@ -157,8 +166,8 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.user_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $1
+      JOIN users u ON r.host_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $1
       WHERE u.id = $1
     `
     const { rows } = await this.pool.query(query, [userID])
@@ -175,9 +184,10 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
     const locationParams: { [key: string]: number } = {}
     fromLocation.city = ''
     fromLocation.neighborhood = ''
+
     let query = `
       SELECT r.*, 
-            u.id AS user_id, 
+            u.id AS host_id, 
             u.first_name AS first_name, 
             u.last_name AS last_name,
             u.pic AS user_pic,
@@ -193,21 +203,20 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       FROM rides r
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.user_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.user_id = $${params.length + 1}
+      JOIN users u ON r.host_id = u.id
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $${params.length + 1}
       WHERE 1 = 1
     `
-
-    // Add the userID to the params for the LEFT JOIN
     params.push(userID)
 
-    // Add fromLocation.neighborhood only once
+    query += ` AND r.host_id != $${params.length + 1}`
+    params.push(userID)
+
     if (fromLocation.neighborhood) {
       locationParams['fromNeighborhood'] = params.length + 1
       params.push(fromLocation.neighborhood)
     }
 
-    // Add toLocation.neighborhood only once
     if (toLocation.neighborhood) {
       locationParams['toNeighborhood'] = params.length + 1
       params.push(toLocation.neighborhood)

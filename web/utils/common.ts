@@ -63,6 +63,7 @@ export const getStartAndEndOfDay = (
   };
 };
 
-export const getLocationLable = (location: IPlaceDetails): string => {
+export const getLocationLable = (location?: IPlaceDetails): string => {
+  if (!location) return '';
   return `${location.neighborhood || location.locality}, ${location.city}`;
 };

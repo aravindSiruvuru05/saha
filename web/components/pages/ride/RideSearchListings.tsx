@@ -6,7 +6,7 @@ import { useSearchRidesQuery } from '@/store/apiSlice';
 import RideCardsList from '@/components/ui/commonComponents/RideCardsList';
 import { Loading } from '@/components/ui/commonComponents/Loading';
 import { useEffect } from 'react';
-import { getStartAndEndOfDay } from '@/utils/common';
+import { getLocationLable, getStartAndEndOfDay } from '@/utils/common';
 
 export const RideSearchListings = () => {
   const location = useLocation();
@@ -77,12 +77,10 @@ export const RideSearchListings = () => {
         </div>
       </div>
       <div className="h-[85vh] flex flex-col container pb-4 p-4 m-auto">
-        {/* Top bar */}
-
         {isRidesFetching ? (
           <Loading />
         ) : (
-          <RideCardsList rideListings={ridesData?.rides!} isBooking />
+          <RideCardsList rideListings={ridesData?.rides} isBooking />
         )}
       </div>
     </>

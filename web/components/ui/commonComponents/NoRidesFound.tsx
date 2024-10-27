@@ -3,12 +3,10 @@ import { Button } from '@/components/ui/button';
 import { useIonRouter } from '@ionic/react';
 
 interface INoRidesFoundProps {
-  simdple: boolean;
-  k: number;
+  simdple?: boolean;
 }
 export const NoRidesFound: React.FC<INoRidesFoundProps> = props => {
   const router = useIonRouter();
-  console.log(props);
   return (
     <div className="bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">

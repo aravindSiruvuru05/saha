@@ -18,15 +18,16 @@ export interface IUserEntity extends IWithId {
   passwordChangedAt?: string
 }
 
+export interface IRideRequestEntity {
+  id: UUID
+  requesterID: UUID
+  rideID: UUID
+  status: RideRequestStatus
+}
+
 export enum RideRequestStatus {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
   DECLINED = 'declined',
-}
-
-export interface IRideRequest {
-  id: UUID
-  userID: UUID
-  rideID: UUID
-  status: RideRequestStatus
+  CANCELED = 'canceled',
 }

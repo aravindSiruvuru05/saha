@@ -22,7 +22,7 @@ export const MyRides = () => {
       {!!ridePosts ? (
         <RideCardsList rideListings={ridePosts} />
       ) : (
-        <NoRidesFound simdple={true} k={1} />
+        <NoRidesFound simdple />
       )}
       <div className="fixed top-16 left-0 right-0 p-4 bg-white container mx-auto max-w-xl">
         <h2 className=" text-xl font-semibold mb-4 pl-4 m-auto">My Rides</h2>

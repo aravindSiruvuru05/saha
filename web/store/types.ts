@@ -59,13 +59,13 @@ export enum IRideType {
   HOUSE_ACCOMDATION = 'HOUSE_ACCOMDATION',
 }
 
-export interface IFindRidesRes {
+export interface ISearchRidesRes {
   fromLocation: string;
   toLocation: string;
   rides: IPost<IRide>[];
 }
 export interface IPost<T = unknown> extends IWithID {
-  user: IUserResult;
+  host: IUserResult;
   details: T;
   about: string;
   type: IRideType;
@@ -94,7 +94,7 @@ export interface ICreateRideRequest {
   startTime: IStartTime;
 }
 
-export interface IFindRidesReqQuery {
+export interface ISearchRidesReqQuery {
   fromPlaceID: string;
   toPlaceID: string;
   startDate: string;
@@ -109,6 +109,14 @@ export interface IJoinRideRequest {
   rideID: string;
 }
 
+export interface ICancelRideRequest {
+  rideID: string;
+}
+
+export interface IAcceptRideRequest {
+  requestID: string;
+}
+
 export enum RideRequestStatus {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
@@ -117,7 +125,7 @@ export enum RideRequestStatus {
 
 export interface IRideRequestResponse {
   id: UUID;
-  userID: UUID;
-  rideID: UUID;
+  ridePost: Partial<IPost<IRide>>;
   status: RideRequestStatus;
+  requester: Partial<IUserResult>;
 }

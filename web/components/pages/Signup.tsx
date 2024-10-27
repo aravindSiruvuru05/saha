@@ -57,7 +57,7 @@ export const Signup = () => {
   };
 
   return (
-    <div className="flex items-center justify-center max-h-screen overflow-y-auto  md:bg-primary bg-transparent">
+    <div className="flex items-center justify-center h-screen overflow-y-auto  md:bg-primary bg-transparent">
       <Card className="w-full max-w-md mx-5 mt-8 shadow-none border-none md:shadow md:border">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">

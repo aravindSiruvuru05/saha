@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/ui/commonComponents/StarRating';
 import { UserCircle2 } from 'lucide-react';
-import { IFindRidesRes, IPost, IRide } from '@/store/types';
+import { ISearchRidesRes } from '@/store/types';
 import { format } from 'date-fns';
 import { isBefore } from 'date-fns';
 import { NoRidesFound } from './NoRidesFound';
@@ -16,23 +16,8 @@ import {
 import { useIonRouter } from '@ionic/react';
 import { ScrollArea } from '../scroll-area';
 
-interface Ride {
-  id: string;
-  user: {
-    name: string;
-    pic?: string;
-  };
-  rating?: number;
-  from: string;
-  to: string;
-  startTime: string;
-  price: number;
-  actualSeats: number;
-  availableSeats: number;
-}
-
 interface RideCardsListProps {
-  rideListings: IFindRidesRes['rides'];
+  rideListings?: ISearchRidesRes['rides'];
   isBooking?: boolean;
 }
 
@@ -99,22 +84,22 @@ const RideCardsList: React.FC<RideCardsListProps> = ({
               <CardContent className="p-4">
                 {isBooking && (
                   <div className="flex items-center space-x-4">
-                    {ride.user.pic ? (
+                    {ride.host.pic ? (
                       <Image
-                        src={ride.user.pic}
-                        alt={ride.user.firstName}
+                        src={ride.host.pic}
+                        alt={ride.host.firstName}
                         width={40}
                         height={40}
                         className="rounded-full"
                       />
                     ) : (
                       <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-white font-bold">
-                        {getInitialsOfName(ride.user)}
+                        {getInitialsOfName(ride.host)}
                       </div>
                     )}
                     <div className="flex-grow">
                       <div className="font-medium">
-                        {getFullName(ride.user)}
+                        {getFullName(ride.host)}
                       </div>
                       <StarRating rating={4} />
                     </div>

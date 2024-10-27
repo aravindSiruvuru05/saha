@@ -51,6 +51,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
 
     const values = Object.values(updatedItem)
     const query = `UPDATE ${this.tableName} SET ${updates} WHERE id = $${values.length + 1} RETURNING *`
+
     const result = await this.pool.query(query, [...values, id])
     return result.rows[0] || null
   }

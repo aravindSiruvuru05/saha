@@ -11,6 +11,8 @@ import {
   Route,
   Search,
   LogOutIcon,
+  BellDotIcon,
+  BellIcon,
 } from 'lucide-react';
 import { PublishRide } from './PublishRide';
 import { RidesSearch } from './RidesSearch';
@@ -81,7 +83,15 @@ export const RideHomeLayout = () => {
           </SheetContent>
         </Sheet>
         <h1 className="text-xl font-bold text-center flex-grow">CarPool</h1>
-        <div className="w-10"></div> {/* Spacer to center the title */}
+        <div className="w-10"></div>
+        <Button variant="ghost" size="icon" className="text-primary-foreground">
+          <BellIcon
+            className="h-6 w-6"
+            onClick={() => {
+              router.push('/notifications');
+            }}
+          />
+        </Button>
       </header>
 
       <main

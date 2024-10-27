@@ -50,7 +50,7 @@ export const createPost = catchAsync(
     }
 
     const newRide = await req.repositories.ride.create({
-      user: { id: req.currUser.id },
+      host: { id: req.currUser.id },
       about: about,
       details: {
         fromLocationID: startLocation.googlePlaceID,

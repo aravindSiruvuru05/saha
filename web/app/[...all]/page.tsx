@@ -19,6 +19,7 @@ export async function generateStaticParams() {
     { all: ['/_next/static/css/app/display.css.map'] },
     { all: ['/placeholder.svg'] },
     { all: ['lists'] },
+    { all: ['notifications'] },
     ...lists.map(list => ({ all: ['lists', list.id] })),
     { all: ['settings'] },
   ];

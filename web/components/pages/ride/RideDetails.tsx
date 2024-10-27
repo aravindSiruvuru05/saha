@@ -10,13 +10,18 @@ import {
   ChevronRight,
   User,
   ArrowLeft,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIonRouter } from '@ionic/react';
-import { useGetRideByIDQuery, useJoinRideMutation } from '@/store/apiSlice';
+import {
+  useCancelRideMutation,
+  useGetRideByIDQuery,
+  useJoinRideMutation,
+} from '@/store/apiSlice';
 import {
   getFullName,
   getInitialsOfName,
@@ -26,47 +31,27 @@ import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/commonComponents/Loading';
 import { format } from 'date-fns';
 import { RideRequestStatus } from '@/store/types';
-
-function ExpandableCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <Card className="mb-4">
-      <CardHeader
-        className="cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <CardTitle className="flex items-center justify-between">
-          {title}
-          <ChevronRight
-            className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-          />
-        </CardTitle>
-      </CardHeader>
-      {isExpanded && (
-        <CardContent
-          className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96' : 'max-h-0'}`}
-        >
-          {children}
-        </CardContent>
-      )}
-    </Card>
-  );
-}
+import { Badge } from '@/components/ui/badge';
 
 export const RideDetails = () => {
   const router = useIonRouter();
   const query = new URLSearchParams(location.search);
   const [
     joinRide,
-    { isLoading: isCreating, error: joinRideError, data, isSuccess },
+    {
+      isLoading: isJoiningRide,
+      error: errorJoinRide,
+      isSuccess: isJoinSuccess,
+    },
   ] = useJoinRideMutation();
+  const [
+    cancelRide,
+    {
+      isLoading: isCancelingRide,
+      error: errorCancelRide,
+      isSuccess: isCancelSuccess,
+    },
+  ] = useCancelRideMutation();
   const rideID = query.get('id');
   const {
     data: rideDetails,
@@ -76,10 +61,10 @@ export const RideDetails = () => {
   } = useGetRideByIDQuery({ id: rideID! });
 
   useEffect(() => {
-    if (rideID || isSuccess) {
+    if (rideID || isCancelSuccess || isJoinSuccess) {
       refetch();
     }
-  }, [rideID, isSuccess, refetch]);
+  }, [rideID, isCancelSuccess, isJoinSuccess, refetch]);
 
   if (isFetchingRide) {
     return <Loading />;
@@ -90,8 +75,14 @@ export const RideDetails = () => {
   }
 
   const handleJoinRide = async () => {
-    const res = await joinRide({ rideID });
-    console.log(res);
+    if (
+      rideDetails.currUserReqStatus === RideRequestStatus.PENDING ||
+      rideDetails.currUserReqStatus === RideRequestStatus.ACCEPTED
+    ) {
+      const res = await cancelRide({ rideID });
+    } else {
+      const res = await joinRide({ rideID });
+    }
   };
 
   return (
@@ -116,16 +107,16 @@ export const RideDetails = () => {
             <div className="flex items-center space-x-4 mb-6">
               <Avatar className="w-16 h-16">
                 <AvatarImage
-                  src={rideDetails.user.pic}
-                  alt={getInitialsOfName(rideDetails.user)}
+                  src={rideDetails.host.pic}
+                  alt={getInitialsOfName(rideDetails.host)}
                 />
                 <AvatarFallback>
-                  {getInitialsOfName(rideDetails.user)}
+                  {getInitialsOfName(rideDetails.host)}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="text-2xl font-bold">
-                  {getFullName(rideDetails.user)}
+                  {getFullName(rideDetails.host)}
                 </h2>
                 <div className="flex items-center">
                   <Star className="w-4 h-4 text-yellow-400 mr-1" />
@@ -171,6 +162,14 @@ export const RideDetails = () => {
                         )}
                       </span>
                     </div>
+                    <div className="flex items-center">
+                      <Badge variant="secondary">
+                        <Users className="mr-1 h-3 w-3" />
+                        {rideDetails.details.actualSeats -
+                          rideDetails.details.seatsFilled}{' '}
+                        left
+                      </Badge>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -199,9 +198,13 @@ export const RideDetails = () => {
       </div>
       <div className="fixed bottom-0 left-0 right-0 p-4 w-[100vw] bg-background shadow-md container mx-auto">
         <Button className="w-full" onClick={handleJoinRide}>
-          {rideDetails?.currUserReqStatus === RideRequestStatus.PENDING
-            ? 'Request Sent 🥳. Click here to cancel.'
-            : 'Join Ride'}
+          {isJoiningRide || isCancelingRide
+            ? 'Loading...'
+            : rideDetails?.currUserReqStatus === RideRequestStatus.PENDING
+              ? 'Request Sent 🥳. Click here to cancel.'
+              : rideDetails?.currUserReqStatus === RideRequestStatus.ACCEPTED
+                ? 'You Joined the ride 🥳. Click here to drop.'
+                : 'Join Ride'}
         </Button>
       </div>
     </div>

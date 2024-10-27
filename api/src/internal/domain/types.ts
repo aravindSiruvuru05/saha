@@ -30,7 +30,7 @@ export enum IRideType {
 }
 
 export interface IPost<T = unknown> extends IWithId {
-  user: Partial<IUser>
+  host: Partial<IUser>
   details: T
   about: string
   type: IRideType
@@ -58,6 +58,13 @@ export interface IHouseAccommodation {
   price: number
   availableFrom: Date
   numberOfMembers: number
+}
+
+export interface IRideRequest {
+  id: UUID
+  ridePost: Partial<IPost<IRide>>
+  status: RideRequestStatus
+  requester: Partial<IUser>
 }
 
 export type HouseAccommodationPost = IPost<IHouseAccommodation>
