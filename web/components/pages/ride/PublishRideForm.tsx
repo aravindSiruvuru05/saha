@@ -140,9 +140,6 @@ export const PublishRideForm = () => {
   return (
     <div className="min-h-[100%] bg-transparent p-4 max-w-[1300px] w-[100%]">
       <Card className="bg-accent">
-        <CardHeader>
-          <CardTitle>Publish a Ride</CardTitle>
-        </CardHeader>
         <CardContent className="space-y-4 items-center">
           {currentStep === 1 && (
             <>

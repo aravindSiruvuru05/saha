@@ -204,92 +204,51 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
       JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
       JOIN users u ON r.host_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $${params.length + 1}
+      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $1
       WHERE 1 = 1
     `
-    params.push(userID)
 
-    query += ` AND r.host_id != $${params.length + 1}`
-    params.push(userID)
-
-    if (fromLocation.neighborhood) {
-      locationParams['fromNeighborhood'] = params.length + 1
-      params.push(fromLocation.neighborhood)
-    }
-
-    if (toLocation.neighborhood) {
-      locationParams['toNeighborhood'] = params.length + 1
-      params.push(toLocation.neighborhood)
-    }
-
-    // Add toLocation.locality only once
-    if (toLocation.locality) {
-      locationParams['toLocality'] = params.length + 1
-      params.push(toLocation.locality)
-    }
-
-    // Add fromLocation.locality only once
-    if (fromLocation.locality) {
-      locationParams['fromLocality'] = params.length + 1
-      params.push(fromLocation.locality)
-    }
-
-    // Add toLocation.city only once
-    if (toLocation.city) {
-      locationParams['toCity'] = params.length + 1
-      params.push(toLocation.city)
-    }
-
-    // Add fromLocation.city only once
-    if (fromLocation.city) {
-      locationParams['fromCity'] = params.length + 1
-      params.push(fromLocation.city)
-    }
-
-    // Build the conditions based on the already added parameters
     if (fromLocation.neighborhood && toLocation.neighborhood) {
       conditions.push(
-        `(startLoc.neighborhood = $${locationParams['fromNeighborhood']} AND endLoc.neighborhood = $${locationParams['toNeighborhood']})`,
+        ` (startLoc.neighborhood = $${params.length + 1} AND endLoc.neighborhood = $${params.length + 2})`,
       )
+      params.push(fromLocation.neighborhood, toLocation.neighborhood)
     }
 
     if (fromLocation.neighborhood && toLocation.locality) {
       conditions.push(
-        `(startLoc.neighborhood = $${locationParams['fromNeighborhood']} AND endLoc.locality = $${locationParams['toLocality']})`,
+        ` (startLoc.neighborhood = $${params.length + 1} AND endLoc.locality = $${params.length + 2})`,
       )
+      params.push(fromLocation.neighborhood, toLocation.locality)
     }
 
     if (fromLocation.locality && toLocation.locality) {
       conditions.push(
-        `(startLoc.locality = $${locationParams['fromLocality']} AND endLoc.locality = $${locationParams['toLocality']})`,
+        ` (startLoc.locality = $${params.length + 1} AND endLoc.locality = $${params.length + 2})`,
       )
+      params.push(fromLocation.locality, toLocation.locality)
     }
 
     if (fromLocation.locality && toLocation.city) {
       conditions.push(
-        `(startLoc.locality = $${locationParams['fromLocality']} AND endLoc.city = $${locationParams['toCity']})`,
+        ` (startLoc.locality = $${params.length + 1} AND endLoc.city = $${params.length + 2})`,
       )
+      params.push(fromLocation.locality, toLocation.city)
     }
 
     if (fromLocation.city && toLocation.city) {
       conditions.push(
-        `(startLoc.city = $${locationParams['fromCity']} AND endLoc.city = $${locationParams['toCity']})`,
+        ` (startLoc.city = $${params.length + 1} AND endLoc.city = $${params.length + 2})`,
       )
+      params.push(fromLocation.city, toLocation.city)
     }
+    query += ` AND ${conditions.join(' OR ')}`
 
-    // Add location conditions to the query
-    if (conditions.length > 0) {
-      query += ` AND (${conditions.join(' OR ')})`
-    }
-
-    // If a startDate is provided, add conditions to the query
-    if (startDate) {
+    if (startDate && endDate) {
       query += ` AND r.start_time >= $${params.length + 1} AND r.start_time < $${params.length + 2}`
       params.push(startDate, endDate)
     }
-
     const result = await this.pool.query(query, params)
-
     return result.rows.map(this.fromRow)
   }
 }

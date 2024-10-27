@@ -126,6 +126,7 @@ export const searchRides = catchAsync(
     }
     const fromLocation = await getPlaceDetails(fromPlaceID)
     const toLocation = await getPlaceDetails(toPlaceID)
+    console.log(fromLocation, toLocation, '=====')
     // Parse start time if provided
     // let parsedStartTime
     // if (startDate) {

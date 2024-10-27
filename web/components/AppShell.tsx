@@ -13,6 +13,7 @@ import { RideSearchListings } from './pages/ride/RideSearchListings';
 import { ActiveTabProvider } from './pages/ActiveTabContext';
 import { RideDetails } from './pages/ride/RideDetails';
 import { Notifications } from './pages/Notifications';
+import { HomePage } from './pages/HomePage';
 
 setupIonicReact({});
 
@@ -37,10 +38,13 @@ const AppShell = () => {
             <Route path="/signin" render={() => <Signin />} exact />
             <Route path="/signup" render={() => <Signup />} exact />
             <Route path="/" exact>
-              <Redirect to="/rides-home" />
+              <Redirect to="/home" />
             </Route>
 
             {/* Protected routes (Tabs as a protected route) */}
+            <ProtectedRoute path="/home" exact>
+              <HomePage />
+            </ProtectedRoute>
             <ProtectedRoute path="/rides-home" exact>
               <ActiveTabProvider>
                 <RideHomeLayout />

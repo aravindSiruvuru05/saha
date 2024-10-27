@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { NoRidesFound } from '@/components/ui/commonComponents/NoRidesFound';
 import RideCardsList from '@/components/ui/commonComponents/RideCardsList';
 import { useGetMyRidesQuery } from '@/store/apiSlice';
@@ -18,15 +19,15 @@ export const MyRides = () => {
   }
 
   return (
-    <div className="w-full h-screen container mx-auto mt-16">
+    <div className="w-full h-screen container mx-auto">
+      <div className="sticky top-0 z-10 bg-white shadow-md font-bold mb-4  pb-4 py-4 flex items-center space-x-4 px-4">
+        My Rides
+      </div>
       {!!ridePosts ? (
         <RideCardsList rideListings={ridePosts} />
       ) : (
         <NoRidesFound simdple />
       )}
-      <div className="fixed top-16 left-0 right-0 p-4 bg-white container mx-auto max-w-xl">
-        <h2 className=" text-xl font-semibold mb-4 pl-4 m-auto">My Rides</h2>
-      </div>
     </div>
   );
 };
