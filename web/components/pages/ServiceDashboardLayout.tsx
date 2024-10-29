@@ -164,7 +164,14 @@ export const ServiceDashboardLayout: React.FC<IServiceDashboardLayoutPros> = ({
               className="w-[200px] lg:w-[300px]"
             />
           </div>
-          <Button variant="ghost" size="icon" className="relative bg-accent">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative bg-accent"
+            onClick={() => {
+              router.push('/notifications');
+            }}
+          >
             <Bell className="h-5 w-5" />
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-primary" />
           </Button>
@@ -185,6 +192,7 @@ export const ServiceDashboardLayout: React.FC<IServiceDashboardLayoutPros> = ({
           {menuItems.map((item, index) => {
             return (
               <button
+                key={index}
                 onClick={() => setActiveTab(item.id)}
                 className={`flex flex-col items-center justify-center w-full h-full  ${
                   activeTab === item.id

@@ -1,4 +1,4 @@
-import { ArrowLeft, User, MapPin, Calendar, Users } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Calendar, Users, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -75,17 +75,19 @@ export const Notifications = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top bar with back button */}
-      <div className="sticky top-0 z-10 bg-background border-b p-4 flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="mr-2"
-          onClick={() => router.goBack()}
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </Button>
-        <h1 className="text-lg font-semibold">Ride Requests</h1>
-      </div>
+      <header className="bg-background border-b h-14 flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-2"
+            onClick={() => router.goBack()}
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </Button>
+          <span>Notificaitons</span>
+        </div>
+      </header>
 
       {pendingRequests && pendingRequests.length > 0 ? (
         <div className="p-4 space-y-4">
