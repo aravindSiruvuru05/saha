@@ -1,5 +1,4 @@
-import { ILocation } from '../adapters/controllers/types'
-import { BaseModel } from './base.model'
+import { IPlaceDetails } from '@shared/types/google_place'
 
 export class Location {
   private static instance: Location
@@ -9,7 +8,7 @@ export class Location {
   public locality!: string
   public city!: string
 
-  constructor(location?: ILocation) {
+  constructor(location?: IPlaceDetails) {
     if (!location) return
     this.googlePlaceID = location.googlePlaceID
     this.neighborhood = location.neighborhood

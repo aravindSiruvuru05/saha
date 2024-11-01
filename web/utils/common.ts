@@ -1,5 +1,5 @@
+import { IPlaceDetails } from '@shared/types/google_place';
 import { isValid } from 'date-fns';
-import { IPlaceDetails } from './google_places';
 
 export const getFullName = ({
   firstName,

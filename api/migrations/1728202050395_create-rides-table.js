@@ -9,6 +9,9 @@ exports.shorthands = undefined
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
+  // Create the enum type for booking status
+  pgm.createType('ride_type_enum', ['host', 'passenger'])
+
   // Create rides table with location references
   pgm.createTable('rides', {
     id: {
@@ -19,7 +22,6 @@ exports.up = (pgm) => {
     },
     host_id: {
       type: 'uuid',
-      notNull: true,
       references: {
         name: 'users', // Name of the referenced table
         column: 'id', // Specific column in the referenced table
@@ -60,7 +62,7 @@ exports.up = (pgm) => {
       type: 'timestamptz',
       notNull: true, // Start time of the trip
     },
-    duration: {
+    distance: {
       type: 'integer',
     },
     price: {
@@ -68,6 +70,10 @@ exports.up = (pgm) => {
     },
     car_model: {
       type: 'varchar',
+    },
+    type: {
+      type: 'ride_type_enum', // Use the enum type for status
+      notNull: true,
     },
     created_at: {
       type: 'timestamptz',
@@ -111,4 +117,7 @@ exports.down = (pgm) => {
 
   // Drop the tables
   pgm.dropTable('rides')
+
+  // Drop the enum type
+  pgm.dropType('ride_type_enum')
 }

@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ISigninResult, IUserRole } from './types';
+import { ISigninRes, IUserRole } from '@shared/types/auth';
 
-// Define the initial state for the user
 interface UserState {
   firstName: string;
   lastName: string;
@@ -28,7 +27,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     // Action to store user data
-    setUser: (state, action: PayloadAction<ISigninResult>) => {
+    setUser: (state, action: PayloadAction<ISigninRes>) => {
       const { token, user } = action.payload;
       state.firstName = user.firstName;
       state.lastName = user.lastName;

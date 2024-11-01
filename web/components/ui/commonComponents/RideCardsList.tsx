@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/ui/commonComponents/StarRating';
 import { UserCircle2 } from 'lucide-react';
-import { ISearchRidesRes } from '@/store/types';
 import { format } from 'date-fns';
 import { isBefore } from 'date-fns';
 import { NoRidesFound } from './NoRidesFound';
@@ -15,6 +14,7 @@ import {
 } from '@/utils/common';
 import { useIonRouter } from '@ionic/react';
 import { ScrollArea } from '../scroll-area';
+import { ISearchRidesRes } from '@shared/types/rides';
 
 interface RideCardsListProps {
   rideListings?: ISearchRidesRes['rides'];

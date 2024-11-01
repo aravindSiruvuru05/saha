@@ -1,26 +1,21 @@
 import { Request, Response, NextFunction } from 'express'
 import catchAsync from '../../../shared/utils/catchAsync'
-import AppError from '../../../shared/utils/appError'
+import AppError, { isAppError } from '../../../shared/utils/appError'
 import { STATUS_CODES } from '../../../shared/utils'
-import { ICreateRideRequest, IGetRidesReq } from './types'
 import { getPlaceDetails } from '../../serviceHandlers/google.service'
 import { UUID } from 'crypto'
+import { IJoinRideReqQuery, ISearchRidesReqQuery } from '@shared/types/rides'
+import {
+  acceptRequestByHostService,
+  cancelRequestService,
+  createRideService,
+  joinRideService,
+} from '../../serviceHandlers/ride.service'
 
 // Create a new ride
-export const createPost = catchAsync(
-  async (
-    req: Request<any, any, ICreateRideRequest>,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    const {
-      about,
-      fromLocation,
-      toLocation,
-      actualSeats,
-      startTime,
-      duration,
-    } = req.body
+export const createRide = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { actualSeats } = req.body
     if (actualSeats < 1) {
       return next(
         new AppError(
@@ -30,41 +25,14 @@ export const createPost = catchAsync(
       )
     }
 
-    const startLocation = await req.repositories.location.getOrCreate({
-      googlePlaceID: fromLocation.googlePlaceID,
-      neighborhood: fromLocation.neighborhood,
-      locality: fromLocation.locality,
-      city: fromLocation.city,
-    })
-    const endLocation = await req.repositories.location.getOrCreate({
-      googlePlaceID: toLocation.googlePlaceID,
-      neighborhood: toLocation.neighborhood,
-      locality: toLocation.locality,
-      city: toLocation.city,
-    })
+    const newRide = await createRideService(
+      req.repositories,
+      req.body,
+      req.currUser.id,
+    )
 
-    if (!startLocation || !endLocation) {
-      return next(
-        new AppError('error creating locations', STATUS_CODES.BAD_REQUEST),
-      )
-    }
-
-    const newRide = await req.repositories.ride.create({
-      host: { id: req.currUser.id },
-      about: about,
-      details: {
-        fromLocationID: startLocation.googlePlaceID,
-        toLocationID: endLocation.googlePlaceID,
-        actualSeats,
-        startTime: startTime.dateTimeValue,
-        duration: duration,
-      },
-    })
-
-    if (!newRide)
-      return next(
-        new AppError('some error occured while creating. please try', 500),
-      )
+    if (isAppError(newRide))
+      return next(new AppError(newRide.message, newRide.statusCode))
 
     res.status(STATUS_CODES.CREATED).json({
       data: {
@@ -79,7 +47,6 @@ export const getUserRides = catchAsync(
     const userId = req.currUser.id
     const userRides = await req.repositories.ride.findRidesByUserID(userId)
 
-    // Return the fetched rides in the response
     res.status(STATUS_CODES.OK).json({
       data: {
         rides: userRides,
@@ -112,9 +79,9 @@ export const getRideByID = catchAsync(
 )
 
 export const searchRides = catchAsync(
-  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { fromPlaceID, toPlaceID, startDate, endDate } =
-      req.query as unknown as IGetRidesReq
+      req.query as unknown as ISearchRidesReqQuery
 
     if (!fromPlaceID || !toPlaceID || !startDate) {
       return next(
@@ -126,15 +93,8 @@ export const searchRides = catchAsync(
     }
     const fromLocation = await getPlaceDetails(fromPlaceID)
     const toLocation = await getPlaceDetails(toPlaceID)
-    console.log(fromLocation, toLocation, '=====')
-    // Parse start time if provided
-    // let parsedStartTime
-    // if (startDate) {
-    //   parsedStartTime = parseISO(startDate)
-    // }
 
-    // Find rides between the locations
-    const rides = await req.repositories.ride.findRides(
+    const rides = await req.repositories.ride.searchRides(
       {
         fromLocation,
         toLocation,
@@ -158,6 +118,101 @@ export const searchRides = catchAsync(
         toLocation: toLocation.description,
         rides,
       },
+    })
+  },
+)
+
+export const joinRideByPassenger = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const { rideID } = req.query as unknown as IJoinRideReqQuery
+    const passengerID = req.currUser.id
+    const rideRequest = await joinRideService(
+      req.repositories,
+      rideID as UUID,
+      passengerID as UUID,
+    )
+    if (isAppError(rideRequest))
+      return next(new AppError(rideRequest.message, rideRequest.statusCode))
+
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        ...rideRequest,
+      },
+    })
+  },
+)
+
+export const cancelRequestByPassenger = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const { rideID } = req.body
+    const passengerID = req.currUser.id
+    const rideRequest = await cancelRequestService(
+      req.repositories,
+      rideID as UUID,
+      passengerID as UUID,
+    )
+    if (isAppError(rideRequest))
+      return next(new AppError(rideRequest.message, rideRequest.statusCode))
+
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        ...rideRequest,
+      },
+    })
+  },
+)
+
+export const acceptRequestByHost = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const { hostID } = req.body
+    const { requestID } = req.query
+    if (!hostID) {
+      return next(
+        new AppError(
+          'Please provide ride request ID to accept.',
+          STATUS_CODES.BAD_REQUEST,
+        ),
+      )
+    }
+
+    const isAcceptSuccess = await acceptRequestByHostService(
+      req.repositories,
+      requestID as UUID,
+      hostID,
+    )
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        isAcceptSuccess,
+      },
+    })
+  },
+)
+
+export const declineRequest = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const { requestID } = req.body
+    const isDeclineSuccess = await acceptRequestByHostService(
+      req.repositories,
+      requestID as UUID,
+      req.currUser.id,
+    )
+    res.status(STATUS_CODES.OK).json({
+      data: {
+        isDeclineSuccess,
+      },
+    })
+  },
+)
+
+export const getPendingRequestsForMyRides = catchAsync(
+  async (req: Request<any, any, any>, res: Response, next: NextFunction) => {
+    const rideRequests =
+      await req.repositories.rideRequests.getPendingRequestsForMyRides(
+        req.currUser.id,
+      )
+
+    res.status(STATUS_CODES.OK).json({
+      data: rideRequests,
     })
   },
 )

@@ -10,22 +10,26 @@ import { APP_LABELS } from '@/utils/labels';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import {
+  ridesStateSlice,
   setFromLocation,
   setRideDate,
   setToLocation,
 } from '@/store/ridesSlice';
+import { ToggleBar } from '@/components/ui/commonComponents/ToggleBar';
 
 export const RidesSearch = () => {
   const dispatch = useDispatch();
   const router = useIonRouter();
 
   const fromLocation = useSelector(
-    (state: RootState) => state.rideSearch.fromLocation,
+    (state: RootState) => state[ridesStateSlice.reducerPath].fromLocation,
   );
   const toLocation = useSelector(
-    (state: RootState) => state.rideSearch.toLocation,
+    (state: RootState) => state[ridesStateSlice.reducerPath].toLocation,
   );
-  const rideDate = useSelector((state: RootState) => state.rideSearch.rideDate);
+  const rideDate = useSelector(
+    (state: RootState) => state[ridesStateSlice.reducerPath].rideDate,
+  );
 
   const handleSwapLocations = () => {
     dispatch(setFromLocation(toLocation));
@@ -53,28 +57,45 @@ export const RidesSearch = () => {
     <Card className="w-full max-w-md mx-auto bg-accent">
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col gap-3 mb-4">
-            <div className="flex gap-3">
-              <GoogleSearchCommandInput
-                value={fromLocation?.description}
-                placeholder={APP_LABELS.startLocaitonPlaceholder}
-                onSelect={p => dispatch(setFromLocation(p))}
-              />
-              <SwapButton onSwapLocations={handleSwapLocations} />
-            </div>
-            <GoogleSearchCommandInput
-              value={toLocation?.description}
-              placeholder={APP_LABELS.destinationPlaceholder}
-              onSelect={p => dispatch(setToLocation(p))}
-            />
-            <DatePicker
-              value={rideDate}
-              onChange={val => dispatch(setRideDate(val))}
-            />
-          </div>
-          <Button type="submit" className="w-full">
-            Search
-          </Button>
+          <ToggleBar
+            options={[
+              {
+                label: 'Find Rides',
+                description:
+                  'Explore drivers offering rides to your destination.',
+                component: (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex gap-3">
+                      <GoogleSearchCommandInput
+                        value={fromLocation?.description}
+                        placeholder={APP_LABELS.startLocaitonPlaceholder}
+                        onSelect={p => dispatch(setFromLocation(p))}
+                      />
+                      <SwapButton onSwapLocations={handleSwapLocations} />
+                    </div>
+                    <GoogleSearchCommandInput
+                      value={toLocation?.description}
+                      placeholder={APP_LABELS.destinationPlaceholder}
+                      onSelect={p => dispatch(setToLocation(p))}
+                    />
+                    <DatePicker
+                      value={rideDate}
+                      onChange={val => dispatch(setRideDate(val))}
+                    />
+                    <Button type="submit" className="w-full">
+                      Search
+                    </Button>
+                  </div>
+                ),
+              },
+              {
+                label: 'Find Requests',
+                description:
+                  'Discover passengers seeking a lift on your route.',
+                component: <>No implementation</>,
+              },
+            ]}
+          />
         </form>
       </CardContent>
     </Card>

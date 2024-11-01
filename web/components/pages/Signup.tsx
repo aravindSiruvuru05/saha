@@ -1,5 +1,3 @@
-// pages/signup.tsx
-
 'use client';
 
 import { useState } from 'react';
@@ -9,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useSignupMutation } from '@/store/apiSlice';
+import { useSignupMutation } from '@/store/authSlice';
 import { useIonRouter } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import { AlertDialog } from '@/components/ui/commonComponents/AlertDialog';

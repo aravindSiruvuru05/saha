@@ -1,7 +1,7 @@
+import { IWithID } from '@shared/types'
 import { UUID } from 'crypto'
-import { IWithId } from './types'
 
-export abstract class BaseModel<T extends IWithId> {
+export abstract class BaseModel<T extends IWithID> {
   public id!: UUID
 
   constructor(id: UUID | null) {

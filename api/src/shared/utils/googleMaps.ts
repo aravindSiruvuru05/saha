@@ -17,9 +17,9 @@ export interface IPlaceDetails {
   neighborhood: string
   locality: string
   city: string
-  state: string
-  country: string
-  description: string
+  state?: string
+  country?: string
+  description?: string
 }
 
 class GoogleMapsService {

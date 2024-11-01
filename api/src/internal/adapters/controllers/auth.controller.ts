@@ -4,17 +4,18 @@ import catchAsync from '../../../shared/utils/catchAsync'
 import { STATUS_CODES, signToken } from '../../../shared/utils'
 import AppError from '../../../shared/utils/appError'
 import {
+  changePasswordAfter,
   createUser,
   findByID,
   getUserByEmail,
+  isCorrectPassword,
 } from '../../serviceHandlers/auth.service'
-import { IUserRequest } from './types'
-import { IUserRole } from '../../domain/types'
+import { ISignupPayload, IUserRole } from '@shared/types/auth'
 
 // User signup
 export const signup = catchAsync(
   async (
-    req: Request<any, any, IUserRequest>,
+    req: Request<any, any, ISignupPayload>,
     res: Response,
     next: NextFunction,
   ) => {
@@ -74,13 +75,13 @@ export const signin = catchAsync(
 
     const user = await getUserByEmail(req, email)
 
-    if (!user || !(await user.isCorrectPassword(password, user.password!))) {
+    if (!user || !(await isCorrectPassword(password, user.password!))) {
       return next(new AppError('Incorrect email or password ', 401))
     }
 
     const token = signToken(user.id)
-    delete user.password
-    delete user.passwordChangedAt
+    delete (user as { password?: string }).password
+    delete (user as { passwordChangedAt?: string }).passwordChangedAt
 
     res.status(STATUS_CODES.OK).json({
       data: {
@@ -121,7 +122,10 @@ export const protect = catchAsync(
     }
 
     // Check if user changed password after the token was issued
-    if (decoded.iat && currentUser.changePasswordAfter(decoded.iat)) {
+    if (
+      decoded.iat &&
+      changePasswordAfter(decoded.iat, currentUser.passwordChangedAt)
+    ) {
       return next(
         new AppError(
           'The password was changed recently. Kindly login again.',
@@ -129,6 +133,8 @@ export const protect = catchAsync(
         ),
       )
     }
+
+    delete (currentUser as { password?: string }).password
 
     req.currUser = currentUser
 

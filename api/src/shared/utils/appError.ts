@@ -13,4 +13,15 @@ class AppError extends Error {
   }
 }
 
+export interface IAppError {
+  message: string
+  statusCode: number
+}
+
+export const isAppError = (error: any): error is IAppError => {
+  if (error && !!error.message && !!error.statusCode) {
+    return true
+  }
+  return false
+}
 export default AppError

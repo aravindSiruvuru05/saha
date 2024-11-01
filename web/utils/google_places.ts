@@ -1,5 +1,6 @@
 // utils/googlePlaces.ts
 import { Loader } from '@googlemaps/js-api-loader';
+import { IPlaceDetails } from '@shared/types/google_place';
 
 const loader = new Loader({
   apiKey: 'AIzaSyB8WhOZ11Lnt4V6WzpdlkE_WcpdkEjMdj4', // Replace with your API key
@@ -51,16 +52,6 @@ export const getCurrentLocationDetails = async (
     });
   });
 };
-
-export interface IPlaceDetails {
-  googlePlaceID: string;
-  neighborhood: string;
-  locality: string;
-  city: string;
-  state: string;
-  country: string;
-  description: string;
-}
 
 // Extract details from a geocode result
 export const extractBiggerAreaFromGeocodeResult = (

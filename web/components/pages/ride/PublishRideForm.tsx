@@ -1,28 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Calendar, Clock, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMediaQuery } from 'react-responsive';
-
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Combobox } from '@/components/ui/combobox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { SingleSelect } from '@/components/ui/commonComponents/SingleSelect';
 import { GoogleSearchCommandInput } from '@/components/ui/commonComponents/GoogleSearchCommandInput';
 import { APP_LABELS } from '@/utils/labels';
-import { IPlaceDetails } from '@/utils/google_places';
-import { useCreatePostMutation } from '@/store/apiSlice';
-import { start } from 'repl';
 import { useIonRouter } from '@ionic/react';
 import { useActiveTab } from '../ActiveTabContext';
+import { ToggleBar } from '@/components/ui/commonComponents/ToggleBar';
+import { useCreateRideMutation } from '@/store/ridesSlice';
+import { IPlaceDetails } from '@shared/types/google_place';
 
 const locations = [
   { value: 'newyork' },
@@ -53,7 +44,7 @@ export const PublishRideForm = () => {
   const [startTime, setStartTime] = useState<string>('');
   const [availableSeats, setAvailableSeats] = useState<string>('');
   const [createPost, { isLoading: isCreating, error }] =
-    useCreatePostMutation();
+    useCreateRideMutation();
   const router = useIonRouter();
   const { setActiveTab } = useActiveTab();
   const [disableSubmit, setDisableSubmit] = useState(false);
@@ -137,21 +128,19 @@ export const PublishRideForm = () => {
     };
   });
 
-  return (
-    <div className="min-h-[100%] bg-transparent p-4 max-w-[1300px] w-[100%]">
-      <Card className="bg-accent">
+  const publishRide = () => {
+    return (
+      <>
         <CardContent className="space-y-4 items-center">
           {currentStep === 1 && (
             <>
               <div className="flex flex-col md:flex-row gap-3">
                 <GoogleSearchCommandInput
-                  label="From"
                   placeholder={APP_LABELS.startLocaitonPlaceholder}
                   onSelect={place => setFromLocation(place)}
                   value={fromLocation?.description}
                 />
                 <GoogleSearchCommandInput
-                  label="To"
                   placeholder={APP_LABELS.destinationPlaceholder}
                   onSelect={place => setToLocation(place)}
                   value={toLocation?.description}
@@ -163,9 +152,8 @@ export const PublishRideForm = () => {
                   onChange={val => setRideDate(val)}
                 />
                 <SingleSelect
-                  label="Start Time"
                   value={startTime}
-                  placeholder="Select time"
+                  placeholder="Select Start Time"
                   items={items}
                   onSelect={setStartTime}
                 />
@@ -207,6 +195,33 @@ export const PublishRideForm = () => {
             {currentStep === steps.length ? 'Submit' : 'Next'}
           </Button>
         </CardFooter>
+      </>
+    );
+  };
+
+  const publishRideRequest = () => {
+    return <>No Implementation</>;
+  };
+
+  return (
+    <div className="min-h-[100%] bg-transparent max-w-[1300px] w-[100%]">
+      <Card className="bg-accent">
+        <ToggleBar
+          options={[
+            {
+              label: 'Create Ride',
+              description:
+                'Offer a ride to others by posting your upcoming trip details.',
+              component: publishRide(),
+            },
+            {
+              label: 'Request Ride',
+              description:
+                'Looking for a ride? Post your travel needs and connect with drivers.',
+              component: publishRideRequest(),
+            },
+          ]}
+        />
       </Card>
     </div>
   );

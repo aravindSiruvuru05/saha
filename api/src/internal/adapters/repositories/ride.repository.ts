@@ -1,8 +1,16 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
-import { IPost, IRide, IRideType } from '../../domain/types'
 import { IPlaceDetails } from '../../../shared/utils/googleMaps'
 import { UUID } from 'crypto'
+import { IRideEntity } from '../../types/rides'
+import { IPost, PostType } from '@shared/types/post'
+import { IRide, RideType } from '@shared/types/rides'
+import {
+  findRideByID,
+  findRidesByUserIDQuery,
+  findRidesQuery,
+  reduceSeatsFilledQuery,
+} from './queries/rides'
 
 interface IFindRidesParams {
   fromLocation: IPlaceDetails
@@ -11,14 +19,6 @@ interface IFindRidesParams {
   endDate: string
 }
 
-interface IRideEntity {
-  fromLocationID: string
-  toLocationID: string
-  actualSeats: number
-  seatsFilled: number
-  startTime: string
-  duration: number
-}
 export class RideRepository extends BaseRepository<IPost<IRide>> {
   constructor(pool: Pool) {
     super(pool, 'rides')
@@ -31,10 +31,14 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         firstName: row.first_name,
         lastName: row.last_name,
         pic: row.user_pic,
+        phoneNumber: row.phone_number,
+        email: row.email,
+        role: row.role,
       },
-      type: IRideType.RIDE,
+      type: PostType.RIDE,
       about: row.details,
       details: {
+        passengers: [],
         fromLocation: {
           googlePlaceID: row.start_place_id,
           neighborhood: row.start_neighborhood,
@@ -50,165 +54,51 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
         actualSeats: row.actual_seats,
         seatsFilled: row.seats_filled,
         startTime: row.start_time,
-        duration: row.duration,
+        distance: row.distance,
+        type: row.type == RideType.HOST ? RideType.HOST : RideType.PASSENGER,
       },
       currUserReqStatus: row.request_status,
     }
   }
 
-  private toRow(
-    ride: Partial<IPost<Partial<IRideEntity>>>,
-  ): Partial<QueryResultRow> {
-    const row: Partial<QueryResultRow> = {}
-
-    if (ride.id !== undefined) {
-      row.id = ride.id
-    }
-    if (ride.host?.id !== undefined) {
-      row.host_id = ride.host.id
-    }
-    if (ride.about !== undefined) {
-      row.about = ride.about
-    }
-    if (ride.details?.fromLocationID !== undefined) {
-      row.from_location_id = ride.details.fromLocationID
-    }
-    if (ride.details?.toLocationID !== undefined) {
-      row.to_location_id = ride.details.toLocationID
-    }
-    if (ride.details?.actualSeats !== undefined) {
-      row.actual_seats = ride.details.actualSeats
-    }
-    if (ride.details?.seatsFilled !== undefined) {
-      row.seats_filled = ride.details.seatsFilled
-    }
-    if (ride.details?.startTime !== undefined) {
-      row.start_time = ride.details.startTime
-    }
-    if (ride.details?.duration !== undefined) {
-      row.end_time = ride.details.duration
-    }
-    if (ride.currUserReqStatus !== undefined) {
-      row.currUserReqStatus = ride.currUserReqStatus
-    }
-
-    return row
+  public async create(item: Omit<IRideEntity, 'id'>): Promise<IPost<IRide>> {
+    const row = await super.create(item)
+    return this.fromRow(row)
   }
 
-  public async create(
-    item: Omit<
-      IPost<Omit<IRideEntity, 'seatsFilled'>>,
-      'id' | 'type' | 'currUserReqStatus'
-    >,
-  ): Promise<IPost<IRide> | null> {
-    const row = await super.create(this.toRow(item))
-    return row ? this.fromRow(row) : null
-  }
-
-  public async reduceSeatFilled(rideID: UUID): Promise<void> {
-    const query = `
-    UPDATE rides
-    SET seats_filled = seats_filled - 1
-    WHERE id = $1 AND seats_filled > 0
-  `
-    await this.pool.query(query, [rideID])
+  public async reduceSeatFilled(rideID: UUID): Promise<IPost<IRide>> {
+    const { rows } = await this.pool.query(reduceSeatsFilledQuery, [rideID])
+    console.log(rows, '======reduce seats')
+    return this.fromRow(rows[0])
   }
 
   public async findRideByID(
     id: string,
-    requesterID: string, // to get the currUserReqStatus
+    requesterID: string,
   ): Promise<IPost<IRide> | null> {
-    const query = `
-      SELECT r.*, 
-             u.id AS host_id, 
-             u.first_name AS first_name, 
-             u.last_name AS last_name,
-             u.pic AS user_pic,
-             startLoc.google_place_id AS start_place_id, 
-             startLoc.neighborhood AS start_neighborhood, 
-             startLoc.locality AS start_locality, 
-             startLoc.city AS start_city, 
-             endLoc.google_place_id AS end_place_id,
-             endLoc.neighborhood AS end_neighborhood, 
-             endLoc.locality AS end_locality, 
-             endLoc.city AS end_city,
-             rr.status AS request_status
-      FROM rides r
-      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
-      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.host_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $2
-      WHERE r.id = $1
-    `
-
-    const { rows } = await this.pool.query(query, [id, requesterID])
+    const { rows } = await this.pool.query(findRideByID, [id, requesterID])
     const row = rows[0]
 
     return row ? this.fromRow(row) : null
   }
 
-  public async findRidesByUserID(userID: UUID): Promise<IPost<IRide>[] | null> {
-    let query = `
-      SELECT r.*, 
-            u.id AS host_id, 
-            u.first_name AS first_name, 
-            u.last_name AS last_name,
-            u.pic AS user_pic,
-            startLoc.google_place_id AS start_place_id, 
-            startLoc.neighborhood AS start_neighborhood, 
-            startLoc.locality AS start_locality, 
-            startLoc.city AS start_city, 
-            endLoc.google_place_id AS end_place_id, 
-            endLoc.neighborhood AS end_neighborhood, 
-            endLoc.locality AS end_locality, 
-            endLoc.city AS end_city,
-            rr.status AS request_status
-      FROM rides r
-      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
-      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.host_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $1
-      WHERE u.id = $1
-    `
-    const { rows } = await this.pool.query(query, [userID])
-
-    return rows.length > 0 ? rows.map(this.fromRow) : []
+  public async findRidesByUserID(userID: UUID): Promise<IPost<IRide>[]> {
+    const { rows } = await this.pool.query(findRidesByUserIDQuery, [userID])
+    return rows.map(this.fromRow)
   }
 
-  public async findRides(
+  public async searchRides(
     { fromLocation, toLocation, startDate, endDate }: IFindRidesParams,
-    userID: string,
+    requesterID: string,
   ): Promise<IPost<IRide>[]> {
     const params: any[] = []
     let conditions: string[] = []
-    const locationParams: { [key: string]: number } = {}
     fromLocation.city = ''
     fromLocation.neighborhood = ''
 
-    let query = `
-      SELECT r.*, 
-            u.id AS host_id, 
-            u.first_name AS first_name, 
-            u.last_name AS last_name,
-            u.pic AS user_pic,
-            startLoc.google_place_id AS start_place_id, 
-            startLoc.neighborhood AS start_neighborhood, 
-            startLoc.locality AS start_locality, 
-            startLoc.city AS start_city, 
-            endLoc.google_place_id AS end_place_id, 
-            endLoc.neighborhood AS end_neighborhood, 
-            endLoc.locality AS end_locality, 
-            endLoc.city AS end_city,
-            rr.status AS request_status
-      FROM rides r
-      JOIN locations startLoc ON r.from_location_id = startLoc.google_place_id
-      JOIN locations endLoc ON r.to_location_id = endLoc.google_place_id
-      JOIN users u ON r.host_id = u.id
-      LEFT JOIN ride_requests rr ON rr.ride_id = r.id AND rr.requester_id = $1
-      WHERE 1 = 1
-    `
+    let query = findRidesQuery
 
-    params.push(userID)
+    params.push(requesterID)
     if (fromLocation.neighborhood && toLocation.neighborhood) {
       conditions.push(
         ` (startLoc.neighborhood = $${params.length + 1} AND endLoc.neighborhood = $${params.length + 2})`,
@@ -249,6 +139,7 @@ export class RideRepository extends BaseRepository<IPost<IRide>> {
       query += ` AND r.start_time >= $${params.length + 1} AND r.start_time < $${params.length + 2}`
       params.push(startDate, endDate)
     }
+    query += ` ORDER BY r.start_time DESC`
     const result = await this.pool.query(query, params)
     return result.rows.map(this.fromRow)
   }

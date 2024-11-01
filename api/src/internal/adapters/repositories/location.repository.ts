@@ -1,9 +1,9 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
 import { Location } from '../../domain/location'
-import { ILocation } from '../controllers/types'
+import { IPlaceDetails } from '@shared/types/google_place'
 
-export class LocationRepository extends BaseRepository<ILocation> {
+export class LocationRepository extends BaseRepository<IPlaceDetails> {
   constructor(pool: Pool) {
     super(pool, 'locations')
   }
@@ -17,7 +17,7 @@ export class LocationRepository extends BaseRepository<ILocation> {
     })
   }
 
-  private toRow(location: Partial<ILocation>): Partial<QueryResultRow> {
+  private toRow(location: Partial<IPlaceDetails>): Partial<QueryResultRow> {
     const row: Partial<QueryResultRow> = {}
 
     if (location.googlePlaceID !== undefined) {
@@ -36,7 +36,7 @@ export class LocationRepository extends BaseRepository<ILocation> {
   }
 
   public async getOrCreate(
-    item: Omit<ILocation, 'id'>,
+    item: Omit<IPlaceDetails, 'id'>,
   ): Promise<Location | null> {
     const existingLocations = await super.findAllByColumn(
       'google_place_id',
@@ -56,7 +56,7 @@ export class LocationRepository extends BaseRepository<ILocation> {
 
   public async update(
     id: string,
-    item: Partial<ILocation>,
+    item: Partial<IPlaceDetails>,
   ): Promise<Location | null> {
     const row = await super.update(id, this.toRow(item))
     return row ? this.fromRow(row) : null

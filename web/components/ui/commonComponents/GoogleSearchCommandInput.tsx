@@ -12,15 +12,15 @@ import {
 } from '@/components/ui/command';
 import { Input } from '../input';
 import { useDebouncedCallback } from 'use-debounce';
-import { ChevronRight, Locate, MapPin, Loader2Icon } from 'lucide-react';
+import { ChevronRight, Locate, MapPin } from 'lucide-react';
 import {
-  IPlaceDetails,
   getPlacePredictions,
   getCurrentLocationDetails,
   getPlaceDetailsByPlaceID,
 } from '@/utils/google_places';
 import { Spinner } from './Spinner';
 import { Label } from '../label';
+import { IPlaceDetails } from '@shared/types/google_place';
 
 interface IGoogleSearchCommandInput {
   label?: string;
@@ -107,8 +107,8 @@ export const GoogleSearchCommandInput = ({
 
   return (
     <div className="w-[100%]">
-      <Label htmlFor="search-input">{label}</Label>
-      <div className="flex items-center border rounded-md shadow-sm bg-white gap-2 w-full max-w-[400px]">
+      {label && <Label htmlFor="search-input">{label}</Label>}
+      <div className="flex items-center border rounded-md shadow-sm bg-white gap-2 w-full max-w-[450px]">
         <MapPin className="ml-2 text-gray-500 h-4 w-4" />
         <Input
           id="search-input"

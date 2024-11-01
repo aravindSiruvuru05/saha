@@ -9,10 +9,8 @@ import rideRouter from './infra/routers/ride.router'
 import googleRouter from './infra/routers/googleMaps.router'
 import globalErrorHandler from './internal/adapters/controllers/error.controller'
 import pool from './infra/db'
-import { User } from './internal/domain/user'
 import { UserRepository } from './internal/adapters/repositories/user.repository'
 import { protect } from './internal/adapters/controllers/auth.controller'
-import { Ride } from './internal/domain/ride'
 import { RideRepository } from './internal/adapters/repositories/ride.repository'
 import { LocationRepository } from './internal/adapters/repositories/location.repository'
 import { RideRequestsRepository } from './internal/adapters/repositories/ride_requests.repository'
@@ -42,10 +40,6 @@ export const injectModels = (
   res: Response,
   next: NextFunction,
 ) => {
-  req.models = {
-    user: new User(),
-    ride: new Ride(),
-  }
   req.repositories = {
     user: new UserRepository(pool),
     ride: new RideRepository(pool),

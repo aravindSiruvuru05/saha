@@ -16,11 +16,12 @@ import { DayPicker, SelectSingleEventHandler } from 'react-day-picker';
 import { Label } from './label';
 
 interface IDatePickerProps {
+  label?: string;
   onChange: (date: Date | undefined) => void;
   value?: Date;
 }
 
-export const DatePicker = ({ value, onChange }: IDatePickerProps) => {
+export const DatePicker = ({ value, onChange, label }: IDatePickerProps) => {
   const [date, setDate] = React.useState<Date | undefined>(value);
   const [open, setOpen] = React.useState(false); // State to control Popover open
 
@@ -32,13 +33,13 @@ export const DatePicker = ({ value, onChange }: IDatePickerProps) => {
 
   return (
     <div className="flex flex-col w-[100%] gap-3">
-      <Label htmlFor="date">Date</Label>
+      {label && <Label htmlFor="date">{label}</Label>}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant={'outline'}
             className={cn(
-              'w-[100%] justify-start text-left font-normal shadow-sm text-md border bg-white hover:bg-white max-w-[400px]',
+              'w-[100%] justify-start text-left font-normal shadow-sm text-md border bg-white hover:bg-white max-w-[450px]',
               !date && 'text-muted-foreground',
             )}
           >

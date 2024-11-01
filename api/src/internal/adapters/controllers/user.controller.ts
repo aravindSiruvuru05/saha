@@ -2,12 +2,12 @@ import { Request, Response, NextFunction } from 'express'
 import { validate as isUUID } from 'uuid'
 import catchAsync from '../../../shared/utils/catchAsync'
 import { findByID } from '../../serviceHandlers/auth.service'
-import { User } from '../../domain/user'
 import AppError from '../../../shared/utils/appError'
+import { IUser } from '@shared/types/auth'
 
 export const getUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    let user: User | null
+    let user: IUser | null
     const userId = req.params.id
 
     if (!isUUID(userId))

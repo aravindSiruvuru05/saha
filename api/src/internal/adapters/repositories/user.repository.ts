@@ -1,15 +1,14 @@
 import { Pool, QueryResultRow } from 'pg'
 import { BaseRepository } from './base.repository'
-import { IUserEntity, IUserRoleEntity } from './types'
-import { IUserRole } from '../../domain/types'
-import { User } from '../../domain/user'
-
-export const mapUserRoleToEntity = (role: IUserRole): IUserRoleEntity => {
+import { IUser, IUserRole } from '@shared/types/auth'
+import { IUserEntity } from './types/user'
+console.log("=====", )
+export const mapUserRoleToEntity = (role: IUserRole): IUserRole => {
   switch (role) {
     case IUserRole.ADMIN:
-      return IUserRoleEntity.ADMIN
+      return IUserRole.ADMIN
     case IUserRole.MEMBER:
-      return IUserRoleEntity.MEMBER
+      return IUserRole.MEMBER
     default:
       throw new Error('Invalid role')
   }
@@ -53,34 +52,35 @@ export class UserRepository extends BaseRepository<IUserEntity> {
     return row
   }
 
-  private fromRow(row: QueryResultRow): User {
-    return new User({
+  private fromRow(row: QueryResultRow): IUserEntity {
+    return {
       id: row.id,
       firstName: row.first_name,
       lastName: row.last_name,
       phoneNumber: row.phone_number,
       email: row.email,
-      photo: row.photo,
-      pic: row.pic,
-      role: row.role,
       password: row.password,
       passwordChangedAt: row.password_changed_at
         ? new Date(row.password_changed_at)
         : undefined,
-    })
+      pic: row.pic,
+      role: row.role,
+    }
   }
 
-  public async create(item: Omit<IUserEntity, 'id'>): Promise<User | null> {
+  public async createUser(
+    item: Omit<IUserEntity, 'id'>,
+  ): Promise<IUser | null> {
     const row = await super.create(this.toRow(item))
     return row ? this.fromRow(row) : null
   }
 
-  public async findByID(id: string): Promise<User | null> {
+  public async findByID(id: string): Promise<IUserEntity | null> {
     const row = await super.findByID(id)
     return row ? this.fromRow(row) : null
   }
 
-  public async findByEmail(email: string): Promise<User | null> {
+  public async findByEmail(email: string): Promise<IUserEntity | null> {
     const rows = await super.findAllByColumn('email', email)
     return !!rows[0] ? this.fromRow(rows[0]) : null
   }

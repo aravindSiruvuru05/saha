@@ -4,13 +4,16 @@
     "target": "ES2020",                  // Specify ECMAScript target version
     "module": "commonjs",                // CommonJS module for Node.js
     "outDir": "./dist",                  // Output directory for compiled JS files
-    "rootDir": "./src",                  // Root directory of the source files
+    "rootDir": "../.",                  // Root directory of the source files
     "strict": true,                       // Enable all strict type checks
     "esModuleInterop": true,              // Enable interoperability with ES modules
     "skipLibCheck": true,                 // Skip checking of all declaration files
     "forceConsistentCasingInFileNames": true, // Disallow inconsistent casing in file names
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
   },
   "include": ["src", "src/express.d.ts"],   
   "exclude": ["node_modules"],            // Exclude `node_modules`
-  
 }

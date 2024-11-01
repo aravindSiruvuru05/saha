@@ -1,27 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import {
-  Star,
-  MapPin,
-  Calendar,
-  Clock,
-  ChevronRight,
-  User,
-  ArrowLeft,
-  Users,
-} from 'lucide-react';
+import { useEffect } from 'react';
+import { format } from 'date-fns';
+import { Star, MapPin, Calendar, ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIonRouter } from '@ionic/react';
-import {
-  useCancelRideMutation,
-  useGetRideByIDQuery,
-  useJoinRideMutation,
-} from '@/store/apiSlice';
 import {
   getFullName,
   getInitialsOfName,
@@ -29,9 +15,13 @@ import {
 } from '@/utils/common';
 import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/commonComponents/Loading';
-import { format } from 'date-fns';
-import { RideRequestStatus } from '@/store/types';
 import { Badge } from '@/components/ui/badge';
+import {
+  useCancelRideMutation,
+  useGetRideByIDQuery,
+  useJoinRideMutation,
+} from '@/store/ridesSlice';
+import { PostRequestStatus } from '@shared/types/post';
 
 export const RideDetails = () => {
   const router = useIonRouter();
@@ -76,10 +66,10 @@ export const RideDetails = () => {
 
   const handleJoinRide = async () => {
     if (
-      rideDetails.currUserReqStatus === RideRequestStatus.PENDING ||
-      rideDetails.currUserReqStatus === RideRequestStatus.ACCEPTED
+      rideDetails.currUserReqStatus === PostRequestStatus.PENDING ||
+      rideDetails.currUserReqStatus === PostRequestStatus.ACCEPTED
     ) {
-      const res = await cancelRide({ rideID });
+      const res = await cancelRide({ requestID: rideID });
     } else {
       const res = await joinRide({ rideID });
     }
@@ -200,9 +190,9 @@ export const RideDetails = () => {
         <Button className="w-full" onClick={handleJoinRide}>
           {isJoiningRide || isCancelingRide
             ? 'Loading...'
-            : rideDetails?.currUserReqStatus === RideRequestStatus.PENDING
+            : rideDetails?.currUserReqStatus === PostRequestStatus.PENDING
               ? 'Request Sent 🥳. Click here to cancel.'
-              : rideDetails?.currUserReqStatus === RideRequestStatus.ACCEPTED
+              : rideDetails?.currUserReqStatus === PostRequestStatus.ACCEPTED
                 ? 'You Joined the ride 🥳. Click here to drop.'
                 : 'Join Ride'}
         </Button>

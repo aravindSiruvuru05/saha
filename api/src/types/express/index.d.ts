@@ -10,11 +10,7 @@ import express from 'express'
 declare global {
   namespace Express {
     interface Request {
-      currUser: User
-      models: {
-        user: User
-        ride: Ride
-      }
+      currUser: IUser
       repositories: {
         user: UserRepository
         ride: RideRepository

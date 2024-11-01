@@ -3,19 +3,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Label } from '../label';
 
 interface IToggleBarProps {
-  options: { label: string; component: JSX.Element }[];
+  title?: string;
+  options: { label: string; component: JSX.Element; description?: string }[];
 }
 
 export const ToggleBar: React.FunctionComponent<IToggleBarProps> = ({
+  title,
   options,
 }) => {
   const [activeTab, setActiveTab] = useState<number>(0);
 
   return (
     <div className="w-full">
-      <div className="relative w-full h-12 bg-accent shadow rounded-full p-1 max-w-md m-auto">
+      {title && (
+        <h2 className="text-lg font-semibold text-center mb-4">{title}</h2>
+      )}
+      {/* Title added */}
+      <div className="relative w-full h-12 bg-white shadow rounded-full p-1 max-w-md m-auto">
         <motion.div
           className="absolute top-1 left-1 bottom-1 rounded-full bg-primary"
           initial={false}
@@ -40,7 +47,10 @@ export const ToggleBar: React.FunctionComponent<IToggleBarProps> = ({
           </ToggleButton>
         </div>
       </div>
-      <div className="mt-8 w-full">{options[activeTab].component}</div>
+      <Label className="mt-4 block text-sm text-muted-foreground">
+        {options[activeTab].description}
+      </Label>
+      <div className="mt-4 w-full">{options[activeTab].component}</div>
     </div>
   );
 };
@@ -60,6 +70,7 @@ function ToggleButton({
         'px-4 py-2 text-sm font-medium transition-colors rounded-full',
         active ? 'text-primary-foreground' : 'text-foreground',
       )}
+      type="button"
       onClick={onClick}
     >
       {children}

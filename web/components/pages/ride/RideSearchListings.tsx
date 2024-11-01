@@ -2,11 +2,11 @@ import { ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIonRouter } from '@ionic/react';
-import { useSearchRidesQuery } from '@/store/apiSlice';
 import RideCardsList from '@/components/ui/commonComponents/RideCardsList';
 import { Loading } from '@/components/ui/commonComponents/Loading';
 import { useEffect } from 'react';
 import { getLocationLable, getStartAndEndOfDay } from '@/utils/common';
+import { useSearchRidesQuery } from '@/store/ridesSlice';
 
 export const RideSearchListings = () => {
   const location = useLocation();
@@ -16,14 +16,6 @@ export const RideSearchListings = () => {
   const rideDate = decodeURIComponent(query.get('date') || '');
 
   const router = useIonRouter();
-  // const {
-  //   data: distaceData,
-  //   error: distanceFetchingError,
-  //   isLoading: isDistanceFetching,
-  // } = useDistanceDetailsQuery({
-  //   originPlaceID: fromID,
-  //   destinationPlaceID: toID,
-  // });
 
   const { startOfLocalDayISO, endOfLocalDayISO } =
     getStartAndEndOfDay(rideDate);
@@ -48,8 +40,6 @@ export const RideSearchListings = () => {
       refetch();
     }
   }, [fromID, toID, startOfLocalDayISO, endOfLocalDayISO, refetch]);
-
-  //TODO: get the distance and time between the from and to locaitons from BE with distance matrix
 
   return (
     <>
@@ -76,7 +66,7 @@ export const RideSearchListings = () => {
           )}
         </div>
       </div>
-      <div className="h-[85vh] flex flex-col container pb-4 p-4 m-auto">
+      <div className="flex flex-col container p-4 mx-auto ">
         {isRidesFetching ? (
           <Loading />
         ) : (

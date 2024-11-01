@@ -8,7 +8,7 @@ import {
 import { Label } from '../label';
 
 interface ISingleSelectProps<T> {
-  label: string;
+  label?: string;
   value: string;
   items: T[];
   placeholder: string;
@@ -25,10 +25,10 @@ export const SingleSelect = <
 }: ISingleSelectProps<T>) => {
   return (
     <div className="flex flex-col w-[100%] gap-3">
-      <Label htmlFor="time">{label}</Label>
+      {label && <Label htmlFor="time">{label}</Label>}
       <Select onValueChange={onSelect} value={value || undefined}>
         <SelectTrigger id="time" className="w-full">
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder} className="text-white" />
         </SelectTrigger>
         <SelectContent>
           {items?.map((item, idx) => (

@@ -13,7 +13,7 @@ export abstract class BaseRepository<T, R = QueryResultRow> {
 
   // Create a new record
   // here the return is QueryResult but these should not be used directly to query but only used in parent class to return actual domain
-  protected async create(item: QueryResultRow): Promise<R | null> {
+  protected async create(item: QueryResultRow): Promise<R> {
     // Generate a UUID for the id field
     const id = uuidv4()
 

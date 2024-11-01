@@ -1,6 +1,5 @@
-import bcrypt from 'bcryptjs'
 import { BaseModel } from './base.model'
-import { IUser, IUserRole } from './types'
+import { IUser, IUserRole } from '@shared/types/auth'
 
 export class User extends BaseModel<IUser> {
   private static instance: User
@@ -22,28 +21,7 @@ export class User extends BaseModel<IUser> {
     this.lastName = user.lastName
     this.phoneNumber = user.phoneNumber
     this.email = user.email
-    this.photo = user.photo
-    this.pic = user.pic
+    this.pic = user.pic || ''
     this.role = user.role
-    this.password = user.password
-    this.passwordChangedAt = user.passwordChangedAt
-  }
-
-  public changePasswordAfter(jwtTimestamp: number) {
-    if (this.passwordChangedAt) {
-      const changedTimeStamp = parseInt(
-        (this.passwordChangedAt.getTime() / 1000).toString(),
-        10,
-      )
-      return jwtTimestamp < changedTimeStamp
-    }
-    return false
-  }
-
-  public async isCorrectPassword(
-    candidatePassword: string,
-    userPassword: string,
-  ) {
-    return await bcrypt.compare(candidatePassword, userPassword)
   }
 }

@@ -1,4 +1,5 @@
-import { IUser } from '../../domain/types'
+import { IUser } from '@shared/types/auth'
+import { IPlaceDetails } from '@shared/types/google_place'
 
 export interface IUserRequest extends IUser {
   confirmPassword: string
@@ -11,13 +12,6 @@ export interface IGetRidesReq {
   endDate: string
 }
 
-export interface ILocation {
-  googlePlaceID: string
-  neighborhood: string
-  locality: string
-  city: string
-}
-
 interface IStartTime {
   dateTimeValue: string
   userTZ: string
@@ -25,9 +19,9 @@ interface IStartTime {
 
 export interface ICreateRideRequest {
   about: string
-  fromLocation: ILocation
-  toLocation: ILocation
-  actualSeats: number
+  fromLocation: IPlaceDetails
+  toLocation: IPlaceDetails
+  seats: number
   startTime: IStartTime
   duration: number
 }
